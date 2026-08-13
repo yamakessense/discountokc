@@ -128,6 +128,55 @@ or in the build output). Two non-Wix dependencies remain:
 Self-hosting the three fonts into `assets/` is the higher-value of the two and
 would make the site fully self-contained.
 
+## AEO / GEO structure — the point of the whole site
+
+The business ranks for its own name and almost nothing else. That is the
+problem this structure exists to fix: somebody typing *how can I save money on
+flooring* or *where do I buy discount ceiling fans in OKC* should land here, and
+an answer engine asked the same thing should quote this site.
+
+**Answer-first (BLUF) blocks are the unit of content.** A `sections` entry on a
+page dict is `(question, bluf, [supporting])` and renders through
+`sections_html()` as:
+
+```
+<div class="qa" id="…"><h2>the question somebody actually types</h2>
+  <p class="bluf">the answer, 40–60 words, in the first sentence or two</p>
+  …supporting detail…
+</div>
+```
+
+Rules that matter, and why:
+
+- **The H2 is the query, verbatim-ish.** Not "Flooring costs" but "How much does
+  it cost to floor a house in Oklahoma City?" The old pages had no body headings
+  at all — the only H2s on the entire site were "Questions, answered" and "Come
+  see it in person", which is exactly why nothing but the brand name ranked.
+- **Answer in the first 40–60 words, then context.** Never build up to it.
+- **Entity-rich, not pronoun-rich.** Write "Jameson's Discount Home Improvement
+  Warehouse stocks…" rather than "we stock…", and name Oklahoma City, the
+  street addresses, the brands and the prices. A retrieval engine lifting one
+  block has to get a complete answer with no antecedents to resolve.
+- **Break out lists and tables.** `.qa` styles `<ol>` and `<table>`; wrap tables
+  in `<div class="tablewrap">` so they scroll on a phone instead of pushing the
+  page sideways.
+- **Visible text first, schema second.** `faq_node()` builds FAQPage from the
+  section questions *and* the FAQ accordion, and every entry is on the page as
+  an `<h2>` or `<summary>`. `howto_nodes()` emits HowTo only where a numbered
+  procedure is genuinely visible. Never add a schema answer with no visible
+  counterpart — a build-time check for that is worth writing if this grows.
+
+`robots.txt` names GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-User,
+Claude-SearchBot, PerplexityBot, Perplexity-User, Google-Extended, Applebot,
+Applebot-Extended, Bingbot, CCBot, Amazonbot and meta-externalagent explicitly.
+`User-agent: *` already allowed them; naming them is unambiguous to an auditor
+and survives a future tightening of the wildcard.
+
+**Done so far:** flooring, lighting and vanities carry answer-first sections.
+**Still to do:** bath, kitchen, patio, tools, rubbermulchokc, bulk-rubber-mulch,
+inventory, deals and the home page, which should become the pillar that links
+down to each cluster.
+
 ## How the site talks
 
 Humble and hard-working. State the thing and stop.

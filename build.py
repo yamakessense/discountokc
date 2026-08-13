@@ -464,6 +464,28 @@ button,input,select,textarea{font:inherit;color:inherit}
 .catnav.catnav-less::before{opacity:1}
 @media(prefers-reduced-motion:reduce){.catnav::before,.catnav::after{transition:none}}
 
+/* ---------- answer-first (BLUF) blocks ----------
+   Each .qa is one question a person actually types, answered in its first
+   sentence or two before any background. The heading is the query and .bluf is
+   the quotable answer, so a retrieval engine lifting a single block still gets
+   a complete, self-contained response. */
+.qa{margin-top:var(--space-8);scroll-margin-top:150px}
+.qa+.qa{border-top:1px solid var(--color-border);padding-top:var(--space-7)}
+.qa h2{margin-bottom:var(--space-3)}
+.qa h3{margin-top:var(--space-5)}
+.bluf{
+  font-size:var(--text-lg);line-height:1.55;color:var(--ink-900);
+  font-weight:var(--fw-medium);
+}
+.qa table{
+  width:100%;border-collapse:collapse;margin:var(--space-4) 0;
+  font-size:15px;font-variant-numeric:tabular-nums;
+}
+.qa th,.qa td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--color-border)}
+.qa th{font-weight:var(--fw-semibold);color:var(--ink-900);background:var(--cream-50)}
+.qa td:first-child{font-weight:var(--fw-medium)}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
 /* ---------- ticket / deal strip ---------- */
 .ticket{background:var(--cream-50);border-bottom:1px solid var(--color-border)}
 .ticket .wrap{
@@ -1265,6 +1287,47 @@ def faq_html(items):
     return "".join(out)
 
 
+def anchor(text):
+    """Stable #id from a question heading, so one answer can be linked and cited."""
+    s = re.sub(r"<[^>]+>", "", strip(text)).lower()
+    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")[:60].rstrip("-")
+
+
+def sections_html(sections):
+    """Answer-first blocks: the query as the heading, the answer immediately under it.
+
+    The old shape buried every fact in a run of paragraphs with no headings at
+    all, so the only thing this site could match was its own name. Here each
+    block is headed by a question somebody actually types, answers it in the
+    first sentence or two, and only then gives background.
+    """
+    out = []
+    for q, bluf, rest in sections:
+        body = "".join(f"<p>{t}</p>" if not t.lstrip().startswith("<") else t
+                       for t in rest)
+        out.append(f'<div class="qa" id="{anchor(q)}"><h2>{q}</h2>'
+                   f'<p class="bluf">{bluf}</p>{body}</div>')
+    return "".join(out)
+
+
+def howto_nodes(p, url):
+    """HowTo for pages that carry a genuine numbered procedure.
+
+    Only emitted where the steps are visible on the page as an ordered list —
+    the schema describes what a reader can already see.
+    """
+    ht = p.get("howto")
+    if not ht:
+        return []
+    name, steps = ht
+    return [{
+        "@type": "HowTo", "@id": url + "#howto", "name": strip(name),
+        "step": [{"@type": "HowToStep", "position": i,
+                  "name": strip(s_name), "text": strip(s_text)}
+                 for i, (s_name, s_text) in enumerate(steps, 1)],
+    }]
+
+
 def build_pages(L):
     """Return list of page dicts. L(slug) -> link href."""
     P = []
@@ -1428,6 +1491,51 @@ def build_pages(L):
             "back room and no reorder. If you see the one you want at the price you want, that's the day to buy it. "
             "Call either store and staff will walk the floor and tell you what's actually there before you drive out.",
         ],
+        sections=[
+            ("What is the cheapest way to remodel a bathroom?",
+             "Replace the vanity, the light fixture and the floor, and leave the plumbing where it is. Those three "
+             "changes alter almost everything a person sees in a bathroom, and all three are do-it-yourself jobs. "
+             "Moving supply lines or drains is what turns an affordable bathroom refresh into a licensed plumbing "
+             "project.",
+             ["A bathroom refresh done this way at Jameson's Discount Home Improvement Warehouse draws on three "
+              "departments in the same building: vanities, lighting and flooring. A 60-inch double vanity with an "
+              "engineered stone top is $629 on the floor now, waterproof luxury vinyl plank runs $2.19 to $2.69 per "
+              "square foot, and vanity light bars come through in closeout lots continuously.",
+              "The order that keeps the work simple:",
+              "<ol>"
+              "<li><b>Floor first, before the vanity goes in.</b> Laying plank under the cabinet footprint is easier "
+              "than cutting around a fitted vanity later.</li>"
+              "<li><b>Vanity second.</b> Match the footprint of the old cabinet so the supply lines and drain land "
+              "where they already are.</li>"
+              "<li><b>Light fixture last.</b> A vanity bar swap is a breaker-off, wire-for-wire job.</li>"
+              "</ol>",
+              "Scratch-and-dent is worth asking about on this project specifically. A Vanity Art bathtub or vanity "
+              "with a chip costs a fraction of a perfect one, and on a cabinet going against a wall the damaged face "
+              "may end up somewhere nobody will ever see. Ask staff to show you where the damage is."]),
+            ("How much does a bathroom vanity cost in Oklahoma City?",
+             "Bathroom vanities at Jameson's Discount Home Improvement Warehouse run at closeout prices, up to 50% "
+             "off retail, with a 60-inch double vanity and engineered stone top currently on the floor at $629. "
+             "Sizes run from compact half-bath singles up to 72-inch doubles, many arriving complete with tops and "
+             "hardware.",
+             ["Brands rotate with the lots. Vanity Art and Wyndham Collection pieces come through regularly, but the "
+              "specific cabinets on the floor change week to week as closeout truckloads land. There is no back room "
+              "and no reorder &mdash; when a lot is gone it is gone.",
+              "The $629 double is a modular unit: two cabinets sit side by side under one top, so the same run "
+              "extends to 72 or 84 inches by adding a section. For a primary bath or a flip where two sinks sell the "
+              "room, that is a considerably cheaper route than a custom cabinet shop.",
+              "Call 405-206-8111 for the Midwest City store or 405-479-7918 for south OKC and staff will walk the "
+              "floor before you drive out."]),
+            ("Can I replace a bathroom vanity myself?",
+             "Yes, if the new vanity matches the footprint of the old one and the supply lines and drain line up. "
+             "Most handy homeowners complete that swap in an afternoon. Moving plumbing, cutting into a stone top, "
+             "or going from a 30-inch cabinet to a 60-inch one is where a licensed plumber earns the fee.",
+             ["The footprint is the whole question. A like-for-like vanity swap is shut off the stops, disconnect the "
+              "trap and supplies, unscrew the cabinet from the wall, set the new one, reconnect. Changing the cabinet "
+              "width moves the drain and the supplies, and that is plumbing work.",
+              "Measure the old cabinet before you shop &mdash; width, depth and height &mdash; and bring those "
+              "numbers with you. Closeout stock is what it is, and knowing your footprint is what lets staff tell "
+              "you in one minute whether anything on the floor fits."]),
+        ],
         faq=[
             ("Where can I buy a discount bathroom vanity in the Oklahoma City metro?",
              "Jameson's Discount Home Improvement Warehouse — 7010 SE 15th Street in Midwest City and 8100 S. Santa Fe "
@@ -1484,6 +1592,60 @@ def build_pages(L):
             "the military discount doesn't come off on top of them. Neither is posted on a sign. If you are doing a "
             "whole house, tell staff how many square feet you need before you start pricing it out and they'll tell "
             "you which way lands cheaper for you.",
+        ],
+        sections=[
+            ("How much does it cost to floor a house in Oklahoma City?",
+             "Waterproof luxury vinyl plank at Jameson's Discount Home Improvement Warehouse runs $2.19 to $2.69 per "
+             "square foot, so a 1,500-square-foot house costs roughly $3,300 to $4,000 in material before waste. "
+             "Click-lock LVP is a do-it-yourself install, so a homeowner doing the work pays no labor at all.",
+             ["Add about 10% to your square footage for cuts and waste before you price a job. A 1,500-square-foot "
+              "house is therefore about 1,650 square feet of plank, or $3,600 to $4,400 at Jameson's current lot "
+              "pricing. Underlayment, transition strips and trim are extra and depend on the room.",
+              "Installed flooring quotes in the Oklahoma City metro bundle labor into the square-foot price, which is "
+              "where most of the cost sits. Removing labor from the equation is the single largest saving available "
+              "on a flooring project, and click-lock plank is the product that makes it realistic for someone who has "
+              "not laid a floor before.",
+              "Jameson's stocks flooring at two Oklahoma City metro stores: 7010 SE 15th Street in Midwest City "
+              "(405-206-8111) and 8100 S. Santa Fe Ave near I-240 in Oklahoma City (405-479-7918). Lot pricing "
+              "changes as truckloads land, so call the store you plan to visit for the current per-square-foot "
+              "number."]),
+            ("What is the cheapest waterproof flooring for a kitchen or bathroom?",
+             "Rigid-core waterproof luxury vinyl plank is the cheapest waterproof floor for a kitchen or bathroom "
+             "once installation is counted. The plank itself is waterproof rather than water-resistant, it floats "
+             "over the existing subfloor, and it needs no mortar, grout or waterproofing membrane the way tile does.",
+             ["Tile is the traditional answer for wet rooms and it is a good floor, but the cost is in the trade. A "
+              "tile job needs a setter, thinset, grout, a wet saw and usually a waterproofing membrane. A rigid-core "
+              "LVP job needs a box knife and a weekend.",
+              "The comparison that matters for a kitchen or bath is the wear layer, not the price tag:",
+              '<div class="tablewrap"><table><thead><tr><th>Wear layer</th><th>Best for</th>'
+              '<th>Not ideal for</th></tr></thead><tbody>'
+              '<tr><td>12 mil</td><td>Bedrooms, guest rooms, closets, light traffic</td>'
+              '<td>Kitchens, entries, rentals</td></tr>'
+              '<tr><td>20 mil</td><td>Kitchens, bathrooms, entries, hallways, rentals, homes with pets or kids</td>'
+              '<td>Nothing &mdash; it is the safe choice everywhere</td></tr>'
+              '</tbody></table></div>',
+              "Two planks can look identical on the floor and wear completely differently. When you compare a price "
+              "at Jameson's against a big-box price, compare the wear layer first."]),
+            ("How can I save money on flooring without buying cheap flooring?",
+             "Buy name-brand running-line flooring through a closeout channel rather than a retail one, and install "
+             "it yourself. Jameson's Discount Home Improvement Warehouse buys waterproof LVP in truckload closeout "
+             "lots, so the discount comes from how the product is purchased rather than from a lower grade of plank.",
+             ["The distinction matters. Cheap flooring means a thin wear layer, a flimsy core and no warranty. "
+              "Discounted flooring means the same rigid-core, manufacturer-warrantied plank a big-box store sells, "
+              "bought as a cancelled order, a discontinued colour or overstock a distributor needed off the floor.",
+              "Four things move the final number on a flooring project in Oklahoma City:",
+              "<ol>"
+              "<li><b>Skip the installer.</b> Click-lock plank is a DIY install. This is the largest single saving "
+              "on the job.</li>"
+              "<li><b>Buy the whole job at once.</b> Closeout lots are finite. Running short in week two means the "
+              "dye lot is gone and the room no longer matches.</li>"
+              "<li><b>Ask about take-all pricing.</b> When a line gets down to the last of it, Jameson's will often "
+              "price the remainder as a pallet deal.</li>"
+              "<li><b>Ask about the military discount.</b> 10% off brand-new running-line vinyl plank. It does not "
+              "stack with take-all or pallet pricing, so ask which one lands cheaper.</li>"
+              "</ol>",
+              "Bring your square footage to either store and staff will tell you what is on the floor, how much of "
+              "it is left, and which pricing route is cheaper for the amount you need."]),
         ],
         faq=[
             ("Is there LVP flooring under $2.50 a square foot in Oklahoma City?",
@@ -1637,6 +1799,57 @@ def build_pages(L):
             "is otherwise fine and you need a blade arm, a downrod, or a remote receiver, call before you replace the "
             "whole thing.",
         ],
+        sections=[
+            ("Where can I buy discount ceiling fans in Oklahoma City?",
+             "Jameson's Discount Home Improvement Warehouse stocks ceiling fans at two Oklahoma City metro stores: "
+             "7010 SE 15th Street in Midwest City and 8100 S. Santa Fe Ave near I-240. Brands include Home Decorators "
+             "Collection, Hunter, Glacier Bay, Project Source and Kichler, at times a thousand fans in stock.",
+             ["Ceiling fans are the deepest single category in the building, in indoor and outdoor styles, with and "
+              "without lights, from small-room sizes up to great-room spans. Stock rotates as closeout lots land, so "
+              "call 405-206-8111 for Midwest City or 405-479-7918 for south OKC to hear what is on the floor today.",
+              "Jameson's also stocks ceiling fan parts &mdash; blade arms, downrods and remote receivers. A fan that "
+              "is otherwise fine rarely needs replacing whole."]),
+            ("Why do so many ceiling fans get returned when nothing is wrong with them?",
+             "Two setup mistakes account for a large share of returned ceiling fans: the handheld remote was never "
+             "paired to the receiver in the canopy, and the fan was wired as though it sat on a single switch when "
+             "the room is actually on a three-way. Neither is a fault in the fan.",
+             ["A returned fan goes back in its box, back to the returns desk, and out of the retail system entirely "
+              "&mdash; usually still working. That is a large part of where Jameson's ceiling fan inventory comes "
+              "from, and it is why the store discloses which fans are open-box or returns at the counter.",
+              "It is also why the checklist below is on this page. Most fans that get boxed back up did not need to "
+              "be."]),
+            ("How do I fix a ceiling fan whose remote won't work?",
+             "Replace the battery, then re-pair the remote to the receiver: cut power at the breaker for about 30 "
+             "seconds, restore it, and within the next 30 seconds press and hold the remote's pairing button until "
+             "the light blinks. Older ceiling fans use DIP switches, which must match between remote and receiver.",
+             ["Check one thing before any of that. A ceiling fan controlled by a remote needs its wall switch left "
+              "on permanently. If somebody flips the wall switch off, the receiver has no power and the remote does "
+              "nothing at all &mdash; the most common cause of a fan that appears dead on arrival.",
+              "The full checklist below covers the six faults that account for nearly every ceiling fan a customer "
+              "believes is broken."]),
+        ],
+        howto=("Troubleshoot a ceiling fan before returning it", [
+            ("Confirm the fan has power",
+             "Check the breaker and the wall switch. A ceiling fan on a remote needs its wall switch left on "
+             "permanently, or the receiver has no power and the remote does nothing."),
+            ("Re-pair the remote to the receiver",
+             "Fit a fresh battery. Cut power at the breaker for about 30 seconds, restore it, then press and hold "
+             "the remote's pairing button within the next 30 seconds until the light blinks. Older fans use DIP "
+             "switches instead, and the pattern in the remote must match the receiver exactly."),
+            ("Check the pull chains",
+             "If the light works but the fan does not, or the reverse, the cause is usually a pull chain left in the "
+             "off position or the receiver in the canopy rather than the motor."),
+            ("Take the fan off any light dimmer",
+             "A ceiling fan motor must not run on a standard light dimmer. A dimmer on a fan circuit causes the hum "
+             "and shortens the motor's life. Fit a normal switch or a proper fan speed control."),
+            ("Check the three-way wiring",
+             "If the fan works from one switch but not the other, the circuit is a three-way wired as though it were "
+             "single-pole. The fan needs constant hot and the travelers picked up correctly."),
+            ("Balance the fan",
+             "A wobble is nearly always mounting or blade balance rather than a bad motor. Confirm the box is "
+             "fan-rated, tighten the bracket to the box, check every blade screw, then use the balance kit that came "
+             "in the carton."),
+        ]),
         extra=lambda L: '''
 <div class="card" style="margin:1.4rem 0">
   <span class="eyebrow">Before you box it back up</span>
@@ -2221,10 +2434,17 @@ def store_nodes():
     return out
 
 
-def faq_node(pid, faq):
+def faq_node(pid, faq, sections=()):
+    """FAQPage covering both the body's answer-first blocks and the FAQ accordion.
+
+    Every question here is visible on the page as an <h2> or a <summary>, and
+    every answer is visible text underneath it. Schema follows the page, never
+    the other way round.
+    """
+    items = [(q, bluf) for q, bluf, _ in sections] + list(faq)
     return {"@type": "FAQPage", "@id": pid + "#faq",
             "mainEntity": [{"@type": "Question", "name": strip(q),
-                            "acceptedAnswer": {"@type": "Answer", "text": strip(a)}} for q, a in faq]}
+                            "acceptedAnswer": {"@type": "Answer", "text": strip(a)}} for q, a in items]}
 
 
 def video_nodes(slug, url):
@@ -2247,7 +2467,7 @@ def video_nodes(slug, url):
 def page_schema(p):
     url = SITE + "/" + (p["slug"] + "/" if p["slug"] else "")
     if p["slug"] == "":
-        graph = store_nodes() + [faq_node(url, p["faq"])]
+        graph = store_nodes() + [faq_node(url, p["faq"], p.get("sections") or ())]
     else:
         # Both store entities ride on EVERY page: an AI engine that retrieves a single
         # category page still gets full name/address/phone/hours without another fetch.
@@ -2260,8 +2480,8 @@ def page_schema(p):
             {"@type": "BreadcrumbList", "@id": url + "#crumbs", "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
                 {"@type": "ListItem", "position": 2, "name": strip(p["h1"]), "item": url}]},
-            faq_node(url, p["faq"]),
-        ] + video_nodes(p["slug"], url)
+            faq_node(url, p["faq"], p.get("sections") or ()),
+        ] + howto_nodes(p, url) + video_nodes(p["slug"], url)
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1)
 
 
@@ -2283,6 +2503,7 @@ def interior_body(p, L):
 <section><div class="wrap">
   {chips}
   {paras}
+  {sections_html(p.get("sections") or ())}
   {key_facts()}
   {extra}
   {photo_strip(p["slug"])}
@@ -2413,7 +2634,17 @@ def build_deploy():
         f.write('<?xml version="1.0" encoding="UTF-8"?>'
                 f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{items}</urlset>')
     with open(os.path.join(SITEDIR, "robots.txt"), "w", encoding="utf-8") as f:
-        f.write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+        # `User-agent: *` already permits everything, but the answer engines are
+        # named one by one on purpose: it is unambiguous to anyone auditing the
+        # file, and it survives a future tightening of the wildcard rule.
+        bots = ["GPTBot", "OAI-SearchBot", "ChatGPT-User",      # OpenAI
+                "ClaudeBot", "Claude-User", "Claude-SearchBot",  # Anthropic
+                "PerplexityBot", "Perplexity-User",              # Perplexity
+                "Google-Extended",                               # Gemini grounding
+                "Applebot", "Applebot-Extended",                 # Apple
+                "Bingbot", "CCBot", "Amazonbot", "meta-externalagent"]
+        blocks = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in bots)
+        f.write(f"User-agent: *\nAllow: /\n\n{blocks}Sitemap: {SITE}/sitemap.xml\n")
     if WRITE_CNAME:
         with open(os.path.join(SITEDIR, "CNAME"), "w", encoding="utf-8") as f:
             f.write("www.discountokc.com\n")
