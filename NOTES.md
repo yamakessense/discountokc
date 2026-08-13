@@ -159,6 +159,12 @@ advertised week to week:
 - **Take-all deals on the last of a line**, which on flooring can mean pallet
   pricing on a style or two.
 
+**They do not stack.** Take-all and pallet prices are already cut well past 10%,
+so the military discount does not come off on top of one. Every page that names
+both has to say so, and both category FAQs carry the question outright, because
+"can I combine these" is exactly the kind of thing a customer asks at the
+counter after reading only one of them.
+
 ## Condition language
 
 The site used to claim inventory was "not seconds, not returns." It isn't — the

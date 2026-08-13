@@ -1480,8 +1480,10 @@ def build_pages(L):
             "Two things worth asking about at the counter. We take <b>10% off for military</b> on brand-new "
             "running-line vinyl plank &mdash; current product, not closeout overage. And when a line gets down to the "
             "last of it, we will often do a take-all deal on what's left, which on flooring can mean pallet pricing "
-            "on a style or two. Neither is posted on a sign. If you are doing a whole house, tell staff how many "
-            "square feet you need before you start pricing it out.",
+            "on a style or two. The two don't stack: take-all and pallet prices are already cut well past 10%, so "
+            "the military discount doesn't come off on top of them. Neither is posted on a sign. If you are doing a "
+            "whole house, tell staff how many square feet you need before you start pricing it out and they'll tell "
+            "you which way lands cheaper for you.",
         ],
         faq=[
             ("Is there LVP flooring under $2.50 a square foot in Oklahoma City?",
@@ -1505,11 +1507,15 @@ def build_pages(L):
              "check that against what's in stock."),
             ("Do you offer a military discount on flooring?",
              "Yes — 10% off brand-new running-line vinyl plank. That's current product rather than closeout overage. "
-             "Ask at the counter at either store."),
+             "Ask at the counter at either store. It doesn't stack with take-all or pallet pricing."),
             ("Do you offer pallet pricing on flooring?",
              "Sometimes. When a line gets down to the last of it we'll often do a take-all deal on what's left, and "
              "on flooring that can mean pallet pricing on a style or two. It isn't advertised, so tell staff how many "
              "square feet you need and they'll tell you what they can do."),
+            ("Can I use the military discount on a take-all or pallet deal?",
+             "No — those don't stack. Take-all and pallet prices are already cut well past 10%, so the military "
+             "discount doesn't come off on top of them. Tell staff what you need and they'll tell you which of the "
+             "two works out cheaper for your job."),
             ("What if the style I want sells out mid-project?",
              "Closeout lots are finite — buy the full quantity for your project up front. Call Midwest City at "
              "405-206-8111 or South OKC at 405-479-7918 to confirm current pallet quantities."),
@@ -1900,8 +1906,9 @@ def build_pages(L):
             "Two things do move below the tag. We offer a <b>10% military discount on brand-new running-line vinyl "
             "plank</b> &mdash; current product, not closeout overage. And when we get down to the last of a line we "
             "will often do a take-all deal on what's left, which on flooring can mean pallet pricing on a style or "
-            "two. Neither is advertised week to week; ask at the counter, and if you are buying a whole house of "
-            "flooring say so up front.",
+            "two. They don't stack &mdash; take-all and pallet prices are already cut well past 10%, so the military "
+            "discount doesn't come off on top of one. Neither is advertised week to week; ask at the counter, and if "
+            "you are buying a whole house of flooring say so up front so staff can tell you which way is cheaper.",
             "Seasonal and holiday decor runs alongside all of it &mdash; trees, lighting and decor at a fraction of "
             "seasonal retail, and it lands early rather than late. If you are decorating a storefront, an office or a "
             "big front yard, come before the picked-over weeks.",
@@ -1932,11 +1939,15 @@ def build_pages(L):
              "prices. New lots arrive weekly and are priced to move when they hit the floor."),
             ("Do you offer a military discount?",
              "Yes — 10% off brand-new running-line vinyl plank flooring. That's on current product, not closeout "
-             "overage. Ask at the counter at either store."),
+             "overage. Ask at the counter at either store. It doesn't stack with take-all or pallet pricing."),
             ("Do you give a better price on large quantities?",
              "Often, yes. When we get down to the last of a line we'll do a take-all deal on what's left, and on "
              "flooring that can mean pallet pricing on a style or two. It isn't advertised — tell staff up front how "
              "much you need and they'll tell you what they can do."),
+            ("Can I combine the military discount with a take-all or pallet deal?",
+             "No — those don't stack. Take-all and pallet prices are already cut well past 10%, so the military "
+             "discount doesn't come off on top of them. Staff will tell you which of the two lands cheaper for what "
+             "you're buying."),
             ("How do I find out what just came in?",
              "Follow us on Facebook and Instagram, or call the store: 405-206-8111 Midwest City, 405-479-7918 South OKC."),
             ("Are the specials at both stores?",
