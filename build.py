@@ -13,7 +13,8 @@ import json, os, re, shutil, html
 # ===================== DESIGN & LAYOUT =====================
 # The real badge logo, embedded so the repo stays a single generator file.
 # build.py writes it to _site/assets/logo.webp on every build.
-LOGO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo.webp")
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+LOGO_FILE = os.path.join(ASSETS_DIR, "logo.webp")
 
 
 def logo_bytes():
@@ -518,6 +519,34 @@ main section.tight{padding-top:0}
 .vslot p{margin:0;font-size:var(--text-body-sm);color:var(--ink-500);line-height:1.55}
 .vslot p b{color:var(--ink-900);font-weight:var(--fw-semibold)}
 
+/* ---------- video facades ---------- */
+.vids{display:grid;gap:var(--space-5);grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.vid{
+  margin:0;background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm);
+  transition:box-shadow var(--dur-base) var(--ease-standard),
+    border-color var(--dur-base),transform var(--dur-base);
+}
+.vid:hover{box-shadow:var(--shadow-md);border-color:var(--blue-200);transform:translateY(-2px)}
+.vid-play{
+  display:block;position:relative;width:100%;aspect-ratio:16/9;
+  padding:0;border:0;background:var(--blue-900);cursor:pointer;overflow:hidden;
+}
+.vid-play img{width:100%;height:100%;object-fit:cover;display:block}
+.vid-btn{
+  position:absolute;inset:0;margin:auto;width:60px;height:60px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--red-500);color:#fff;border-radius:var(--radius-pill);
+  box-shadow:var(--shadow-deal);
+  transition:transform var(--dur-fast) var(--ease-standard),background var(--dur-fast);
+}
+.vid-play:hover .vid-btn{transform:scale(1.08);background:var(--red-600)}
+.vid iframe{display:block;width:100%;aspect-ratio:16/9;border:0}
+.vid figcaption{
+  padding:var(--space-4);font-size:var(--text-body-sm);line-height:1.45;
+  color:var(--ink-700);font-weight:var(--fw-medium);
+}
+
 /* ---------- photo strip ---------- */
 .shots-head{margin:var(--space-8) 0 var(--space-3)}
 .shots{display:grid;gap:var(--space-5);grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
@@ -923,6 +952,82 @@ VSLOT = ('<div class="vslot"><div class="vshot">' + icon('play', 40) + '</div><d
          '<p><b>Video slot &mdash; reserved.</b> Three to five of your YouTube videos drop in here, each with a '
          'short written summary and VideoObject schema, once the channels are tagged and sorted.</p>'
          '</div></div>')
+
+# ---------------------------------------------------------------- videos
+# Real uploads from the two YouTube channels, routed to a category page by the
+# hashtags and product words in their own titles. Titles are the channel's own,
+# with hashtags and emoji removed; nothing here is invented. Videos whose title
+# and tags give no product signal are deliberately left out rather than guessed
+# at, and the Yukon "moving sale" clip is excluded because that store is closed.
+YT_CHANNELS = {
+    "mwc":   "https://www.youtube.com/@jamesonsdiscount",
+    "south": "https://www.youtube.com/@jamesonsdiscountsouthokc",
+}
+VIDEOS = {
+  "vanities": [
+    ("AtswzBLP6kA", "New loading crew. 60\" double sink solid wood bathroom vanity $769", "2026-03-17"),
+    ("rYgr7xcN_yY", "Vanity insanity just took on a whole new meaning! Come check out the huge selection", "2025-08-15"),
+    ("TrnCrqlkFZ8", "This isn't just a bathroom vanity, it's THE bathroom vanity! Just $599", "2026-07-22"),
+  ],
+  "flooring": [
+    ("-13vO-FwdnY", "Let's talk about luxury vinyl plank. Let me know what you think", "2026-01-28"),
+    ("S4iwi4uNowk", "Don't miss out get an additional 20% off all tile through August 31", "2026-08-02"),
+  ],
+  "bath": [
+    ("iAfKjzgLdh0", "These champion 4 toilets are the real deal - just $149 each right now", "2025-08-23"),
+    ("uRLSbuFIchg", "Get your medicine cabinets here and save HUGE", "2026-08-01"),
+  ],
+  "lighting": [
+    ("FsJPSvkhFC8", "$10 solar shop lights", "2025-06-22"),
+    ("KlqZBpRCjgY", "See em all at 8100 S Santa Fe Avenue! We'll be here all weekend", "2026-07-23"),
+    ("bE_9Aq2iPV4", "You could call us ceiling fan central", "2026-07-24"),
+  ],
+  "tools": [
+    ("MmJwDJo6jgY", "Milwaukee rotary hammer! Brand new - just $389", "2026-07-31"),
+  ],
+  "patio": [
+    ("__QPFj2zHG4", "Self watering garden bed?! Just $89 with us", "2026-08-12"),
+  ],
+  "rubbermulchokc": [
+    ("WchKlNG3sK0", "New blue rubber mulch", "2026-07-26"),
+    ("tbPuI6t-qBo", "Rubber mulch for the low low! Available at both locations", "2026-08-05"),
+  ],
+  "deals": [
+    ("Q91eW0A9YN8", "Higher Merv air filters mean less housework for you! Get them for half of retail with us", "2025-06-22"),
+  ],
+}
+
+
+def video_block(slug):
+    """Facade embeds: the YouTube thumbnail is a button, and the iframe is only
+    created on click. Nothing is requested from YouTube until the visitor asks
+    for it, so the page stays fast and sets no third-party cookies on load."""
+    vids = VIDEOS.get(slug) or []
+    if not vids:
+        return VSLOT
+    cards = []
+    for vid, title, _ in vids:
+        t = html.escape(title, quote=True)
+        cards.append(
+            f'<figure class="vid"><button type="button" class="vid-play" data-yt="{vid}" '
+            f'aria-label="Play video: {t}">'
+            f'<img src="https://i.ytimg.com/vi/{vid}/hqdefault.jpg" alt="" loading="lazy" '
+            f'decoding="async" width="480" height="360">'
+            f'<span class="vid-btn">{icon("play", 28)}</span></button>'
+            f'<figcaption>{t}</figcaption></figure>')
+    return ('<div class="shots-head"><span class="eyebrow">From the warehouse floor</span></div>'
+            f'<div class="vids">{"".join(cards)}</div>')
+
+
+VIDEO_SCRIPT = (
+    "<script>document.addEventListener('click',function(e){"
+    "var b=e.target.closest('.vid-play');if(!b)return;"
+    "var f=document.createElement('iframe');"
+    "f.src='https://www.youtube-nocookie.com/embed/'+b.dataset.yt+'?autoplay=1&rel=0';"
+    "f.title=b.getAttribute('aria-label').replace(/^Play video: /,'');"
+    "f.allow='accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture';"
+    "f.allowFullscreen=true;f.loading='lazy';"
+    "b.replaceWith(f)});</script>")
 
 CATS = [
     ("flooring", "layers", "Flooring", "Waterproof LVP &amp; tile"),
@@ -1574,16 +1679,28 @@ def strip(t):
 
 
 # ----------------------------------------------------------------- schema
+# lat/lng geocoded from the street addresses via OpenStreetMap Nominatim.
+# maps_q is the same Google Maps address query the "Get directions" buttons use.
 STORES = [
     dict(_id="#midwest-city", tel="+1-405-206-8111", street="7010 SE 15th Street",
-         city="Midwest City", zipc="73110",
+         city="Midwest City", zipc="73110", lat=35.4495875, lng=-97.4043231,
+         maps_q="7010+SE+15th+Street+Midwest+City+OK+73110",
          desc="Closeout home improvement warehouse with name-brand products up to 50% off retail. "
               "Vanities, flooring, bath, kitchen, lighting, tools, patio and more.",
          area=["Midwest City", "Del City", "Oklahoma City", "Choctaw", "Nicoma Park", "Harrah"]),
     dict(_id="#south-okc", tel="+1-405-479-7918", street="8100 S. Santa Fe Ave",
-         city="Oklahoma City", zipc="73139",
+         city="Oklahoma City", zipc="73139", lat=35.3867990, lng=-97.5123449,
+         maps_q="8100+S+Santa+Fe+Ave+Oklahoma+City+OK+73139",
          desc="Closeout home improvement warehouse near I-240 with name-brand products up to 50% off retail.",
          area=["Oklahoma City", "Moore", "Norman", "Del City", "Newcastle"]),
+]
+
+# Only URLs confirmed by the owner belong in sameAs.
+SAME_AS = [
+    "https://www.instagram.com/discountokc/",
+    "https://www.instagram.com/jamesons_discount_mwc/",
+    "https://www.youtube.com/@jamesonsdiscount",
+    "https://www.youtube.com/@jamesonsdiscountsouthokc",
 ]
 HOURS = [
     {"@type": "OpeningHoursSpecification",
@@ -1602,9 +1719,11 @@ def store_nodes():
             "address": {"@type": "PostalAddress", "streetAddress": s["street"], "addressLocality": s["city"],
                         "addressRegion": "OK", "postalCode": s["zipc"], "addressCountry": "US"},
             "openingHoursSpecification": HOURS, "areaServed": s["area"], "email": "save@discountokc.com",
-            "logo": SITE + "/assets/logo.webp", "image": SITE + "/assets/logo.webp",
-            "sameAs": ["https://www.instagram.com/discountokc/",
-                       "https://www.instagram.com/jamesons_discount_mwc/"],
+            "logo": SITE + "/assets/logo.webp", "image": SITE + "/assets/og-card.png",
+            "geo": {"@type": "GeoCoordinates", "latitude": s["lat"], "longitude": s["lng"]},
+            "hasMap": "https://www.google.com/maps/search/?api=1&query=" + s["maps_q"],
+            "currenciesAccepted": "USD",
+            "sameAs": SAME_AS,
         })
     out.append({
         "@type": "Organization", "@id": "https://405rubbermulch.com/#org", "name": "405RubberMulch.com",
@@ -1621,6 +1740,23 @@ def faq_node(pid, faq):
     return {"@type": "FAQPage", "@id": pid + "#faq",
             "mainEntity": [{"@type": "Question", "name": strip(q),
                             "acceptedAnswer": {"@type": "Answer", "text": strip(a)}} for q, a in faq]}
+
+
+def video_nodes(slug, url):
+    """VideoObject per embedded upload. Name and description are the channel's
+    own title - nothing about the footage is described that isn't stated there."""
+    out = []
+    for vid, title, published in VIDEOS.get(slug) or []:
+        out.append({
+            "@type": "VideoObject", "@id": url + "#video-" + vid,
+            "name": title, "description": title,
+            "thumbnailUrl": f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
+            "uploadDate": published,
+            "embedUrl": f"https://www.youtube-nocookie.com/embed/{vid}",
+            "url": f"https://www.youtube.com/watch?v={vid}",
+            "publisher": {"@id": SITE + "/#midwest-city"},
+        })
+    return out
 
 
 def page_schema(p):
@@ -1640,7 +1776,7 @@ def page_schema(p):
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
                 {"@type": "ListItem", "position": 2, "name": strip(p["h1"]), "item": url}]},
             faq_node(url, p["faq"]),
-        ]
+        ] + video_nodes(p["slug"], url)
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1)
 
 
@@ -1664,7 +1800,7 @@ def interior_body(p, L):
   {paras}
   {extra}
   {photo_strip(p["slug"])}
-  <div style="margin-top:1.6rem">{VSLOT}</div>
+  <div style="margin-top:1.6rem">{video_block(p["slug"])}</div>
 </div></section>
 <section class="tint"><div class="wrap">
   <div class="sechead"><span class="eyebrow">Answers</span><h2>Questions, answered</h2></div>
@@ -1698,12 +1834,23 @@ def full_page(p, body, L):
 <meta property="og:title" content="{strip(p['title'])}">
 <meta property="og:description" content="{strip(p['desc'])}">
 <meta property="og:url" content="{url}">
+<meta property="og:site_name" content="{BIZ}">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{strip(p['title'])}">
+<meta name="twitter:description" content="{strip(p['desc'])}">
+<meta name="twitter:image" content="{SITE}/assets/og-card.png">
 <meta name="theme-color" content="#45579F">
+<link rel="preconnect" href="https://static.wixstatic.com" crossorigin>
 {FONTS}
 <link rel="stylesheet" href="{BASE}/assets/site.css">
-<link rel="icon" type="image/webp" href="{BASE}/assets/logo.webp">
-<link rel="apple-touch-icon" href="{BASE}/assets/logo.webp">
-<meta property="og:image" content="{SITE}/assets/logo.webp">
+<link rel="icon" href="{BASE}/assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{BASE}/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="{BASE}/assets/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="{BASE}/assets/apple-touch-icon.png">
+<meta property="og:image" content="{SITE}/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Jameson's Discount Home Improvement Warehouse">
 <script type="application/ld+json">
 {page_schema(p)}
@@ -1718,6 +1865,7 @@ def full_page(p, body, L):
 </main>
 {footer(L)}
 {search_script(L)}
+{VIDEO_SCRIPT if VIDEOS.get(p['slug']) else ''}
 </body>
 </html>
 '''
@@ -1729,7 +1877,11 @@ def build_deploy():
     os.makedirs(os.path.join(SITEDIR, "assets"), exist_ok=True)
     with open(os.path.join(SITEDIR, "assets", "site.css"), "w", encoding="utf-8") as f:
         f.write(CSS)
-    shutil.copyfile(LOGO_FILE, os.path.join(SITEDIR, "assets", "logo.webp"))
+    # Every binary in assets/ (logo, favicons, social card) ships as-is.
+    for name in sorted(os.listdir(ASSETS_DIR)):
+        src = os.path.join(ASSETS_DIR, name)
+        if os.path.isfile(src):
+            shutil.copyfile(src, os.path.join(SITEDIR, "assets", name))
     pages = build_pages(dep_link)
     urls = []
     for p in pages:
@@ -1756,7 +1908,11 @@ def build_deploy():
 {topbar(dep_link)}{masthead(dep_link)}{catnav(dep_link,'')}<main>{body404}</main>{footer(dep_link)}</body></html>''')
 
     with open(os.path.join(SITEDIR, "sitemap.xml"), "w", encoding="utf-8") as f:
-        items = "".join(f"<url><loc>{u}</loc><changefreq>weekly</changefreq></url>" for u in urls)
+        today = __import__("datetime").date.today().isoformat()
+        items = "".join(
+            f"<url><loc>{u}</loc><lastmod>{today}</lastmod><changefreq>weekly</changefreq>"
+            f"<priority>{'1.0' if u.rstrip('/').endswith('.com') else '0.8'}</priority></url>"
+            for u in urls)
         f.write('<?xml version="1.0" encoding="UTF-8"?>'
                 f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{items}</urlset>')
     with open(os.path.join(SITEDIR, "robots.txt"), "w", encoding="utf-8") as f:
@@ -1800,6 +1956,7 @@ def build_preview():
 <main id="app"></main>
 {footer(prev_link)}
 {search_script(prev_link)}
+{VIDEO_SCRIPT}
 <script>
 const PAGES = {js};
 function route(){{
