@@ -588,6 +588,11 @@ main section.tight{padding-top:0}
 }
 .loc h3{font-size:var(--text-xl);color:#fff}
 .loc .addr{color:var(--blue-100);margin-bottom:var(--space-2);font-size:15px}
+.loc .landmark{
+  display:inline-flex;align-items:center;gap:6px;margin-bottom:var(--space-2);
+  font-size:13px;font-weight:var(--fw-semibold);color:var(--blue-800);
+  background:var(--cream-100);border-radius:var(--radius-pill);padding:5px 12px;
+}
 .loc .tel{
   font-family:var(--font-display);font-weight:var(--fw-bold);
   font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
@@ -921,6 +926,7 @@ def locations_block(heading="Two stores across the OKC metro"):
   <div class="loc">
     <h3>Midwest City</h3>
     <p class="addr">7010 SE 15th Street<br>Midwest City, OK 73110</p>
+    <p class="landmark">Look for Big Jim, our 52-foot blue dinosaur.</p>
     <a class="tel" href="tel:+14052068111">405-206-8111</a><br>
     <a class="dir" href="https://www.google.com/maps/search/?api=1&amp;query=7010+SE+15th+Street+Midwest+City+OK+73110">{icon('pin',16)} Get directions</a>
   </div>
@@ -1709,6 +1715,11 @@ def build_pages(L):
             "distributor needs off the floor. Selling it at half retail keeps it in service in Oklahoma homes instead "
             "of in a waste stream. Our paint line works the same way: Visions Quality Coatings remanufactures premium "
             "post-consumer material that would otherwise be disposed of.",
+            "And then there's Big Jim. He is a 52-foot blue dinosaur, he is our mascot, and since 2025 he has stood "
+            "at the Midwest City store on SE 15th Street. If you have lived in the metro a while you have probably "
+            "given someone directions using him without knowing his name. He is the reason people say &ldquo;the "
+            "place with the dinosaur&rdquo; instead of the address, and we are entirely fine with that &mdash; a "
+            "family business that has been here ten years should be easy to find and hard to forget.",
             "We buy as well as sell, and we source locally where we can. If you're a manufacturer, distributor, "
             "builder or contractor sitting on a cancelled order, a discontinued line, a closeout lot or a warehouse "
             "you need cleared, we'll look at it. Reach the sales department at "
@@ -1743,6 +1754,9 @@ def build_pages(L):
             "Both stores are open Tuesday through Saturday from 9:00 AM to 6:00 PM and Sunday from 10:00 AM to 6:00 "
             "PM, and both are closed on Monday. Sales are in-store, and because inventory is closeout-driven, calling "
             "the specific store before you drive out is the fastest way to know what's actually on the floor.",
+            "The Midwest City store is the easy one to find: look for Big Jim, our 52-foot blue dinosaur, standing "
+            "at 7010 SE 15th Street. He moved to Midwest City in 2025, so if you remember him somewhere else, that "
+            "is where he is now. If someone tells you to meet them at the dinosaur, this is the dinosaur.",
             "These are real brick-and-mortar warehouses, not a pop-up or a drop-ship storefront with a mailing "
             "address. Two buildings, ten years in the Oklahoma City metro, staff who walk the floor and count what's "
             "actually there when you call. You can put your hands on the vanity, open the cabinet door, and look at "
@@ -1753,7 +1767,11 @@ def build_pages(L):
             ("What are Jameson's hours?",
              "Tuesday through Saturday 9:00 AM to 6:00 PM, Sunday 10:00 AM to 6:00 PM, closed Monday — both locations."),
             ("Where is the Midwest City store?",
-             "7010 SE 15th Street, Midwest City, OK 73110. Phone 405-206-8111."),
+             "7010 SE 15th Street, Midwest City, OK 73110. Phone 405-206-8111. Look for Big Jim, our 52-foot blue "
+             "dinosaur, who has stood at this store since 2025."),
+            ("Where is the big blue dinosaur in Oklahoma City?",
+             "Big Jim, the 52-foot blue dinosaur, stands at Jameson's Discount Home Improvement Warehouse, 7010 SE "
+             "15th Street in Midwest City. He moved there in 2025."),
             ("Where is the South OKC store?",
              "8100 S. Santa Fe Ave, Oklahoma City, OK 73139, near I-240. Phone 405-479-7918."),
             ("Do both stores carry the same items?",
@@ -1827,7 +1845,8 @@ STORES = [
          city="Midwest City", zipc="73110", lat=35.4495875, lng=-97.4043231,
          maps_q="7010+SE+15th+Street+Midwest+City+OK+73110",
          desc="Closeout home improvement warehouse with name-brand products up to 50% off retail. "
-              "Vanities, flooring, bath, kitchen, lighting, tools, patio and more.",
+              "Vanities, flooring, bath, kitchen, lighting, tools, patio and more. Home of Big Jim, "
+              "the 52-foot blue dinosaur, who has stood at the Midwest City store since 2025.",
          area=["Midwest City", "Del City", "Oklahoma City", "Choctaw", "Nicoma Park", "Harrah"]),
     dict(_id="#south-okc", tel="+1-405-479-7918", street="8100 S. Santa Fe Ave",
          city="Oklahoma City", zipc="73139", lat=35.3867990, lng=-97.5123449,
