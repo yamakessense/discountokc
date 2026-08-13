@@ -519,6 +519,24 @@ main section.tight{padding-top:0}
 .vslot p{margin:0;font-size:var(--text-body-sm);color:var(--ink-500);line-height:1.55}
 .vslot p b{color:var(--ink-900);font-weight:var(--fw-semibold)}
 
+/* ---------- key facts (answer chunk) ---------- */
+.keyfacts{
+  margin:var(--space-8) 0 0;border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);background:var(--color-surface-warm);
+  box-shadow:var(--shadow-xs);overflow:hidden;
+}
+.kf{display:grid;grid-template-columns:210px 1fr;gap:var(--space-5);padding:var(--space-4) var(--space-6)}
+.kf + .kf{border-top:1px solid var(--color-border)}
+.keyfacts dt{
+  font-family:var(--font-body);font-weight:var(--fw-bold);font-size:var(--text-xs);
+  letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--blue-600);
+  padding-top:2px;
+}
+.keyfacts dd{margin:0;font-size:15px;line-height:1.55;color:var(--ink-700);max-width:74ch}
+@media(max-width:700px){
+  .kf{grid-template-columns:1fr;gap:var(--space-1)}
+}
+
 /* ---------- video facades ---------- */
 .vids{display:grid;gap:var(--space-5);grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .vid{
@@ -1050,6 +1068,35 @@ def cat_grid(L):
     return f'<div class="grid">{tiles}</div>'
 
 
+def key_facts():
+    """A self-contained answer chunk.
+
+    Answer engines quote a passage, not a page. This block puts what the
+    business is, where it is, when it's open and how you buy it inside one
+    short, unambiguous run of text, so a model retrieving any single page can
+    answer "where do I buy discount flooring in OKC" without a second fetch.
+    Every value here is the verified one; nothing is restated loosely."""
+    rows = [
+        ("What it is",
+         "A DIY closeout store. Name-brand running-line product, overstock, open-box and "
+         "special-buy lots &mdash; flooring, vanities, bath, kitchen, lighting, tools, patio, "
+         "paint and rubber mulch &mdash; at up to 50% off retail."),
+        ("Where",
+         "Two Oklahoma City metro stores: 7010 SE 15th Street, Midwest City, OK 73110 "
+         "(405-206-8111) and 8100 S. Santa Fe Ave, Oklahoma City, OK 73139, near I-240 "
+         "(405-479-7918)."),
+        ("Hours",
+         "Tuesday to Saturday 9:00 AM to 6:00 PM, Sunday 10:00 AM to 6:00 PM, closed Monday."),
+        ("How you buy",
+         "In store. Stock is closeout-driven and turns over weekly, so call the store you "
+         "plan to visit and staff will check the floor before you drive out."),
+        ("How long we've been here",
+         "Ten years serving the Oklahoma City metro. Family owned and operated."),
+    ]
+    items = "".join(f"<div class=\"kf\"><dt>{k}</dt><dd>{v}</dd></div>" for k, v in rows)
+    return f'<dl class="keyfacts">{items}</dl>'
+
+
 def faq_html(items):
     """<details>/<summary>, styled as the design system's Accordion. Every answer
     stays in the DOM with no JavaScript, so crawlers and AI retrieval see it."""
@@ -1133,7 +1180,7 @@ def build_pages(L):
 </div></div></section>
 <section><div class="wrap">
   <div class="sechead"><span class="eyebrow">Why Jameson's</span>
-  <h2>A closeout warehouse, not a salvage yard</h2></div>
+  <h2>Running-line product at closeout prices, ten years in the OKC metro</h2></div>
   <div class="split">
     <div class="card"><h3>Running-line, in the box</h3>
       <p>Our flooring, paint and fixtures are name-brand, running-line product &mdash; not seconds, not returns.
@@ -1798,6 +1845,7 @@ def interior_body(p, L):
 <section><div class="wrap">
   {chips}
   {paras}
+  {key_facts()}
   {extra}
   {photo_strip(p["slug"])}
   <div style="margin-top:1.6rem">{video_block(p["slug"])}</div>
