@@ -24,6 +24,8 @@ def logo_bytes():
 BIZ = "Jameson's Discount Home Improvement Warehouse"
 SHORT = "Jameson's"
 SITE = "https://www.discountokc.com"
+# Seller profile URL. The /str/ vanity form 410s - this is the one that resolves.
+EBAY_URL = "https://www.ebay.com/usr/jamesons.stores.okc"
 
 CSS = r"""
 /* ===========================================================================
@@ -962,6 +964,7 @@ def footer(L):
     <a href="{L('contact')}">Contact</a>
   </div>
   <div><h4>More</h4>{more}
+    <a href="{EBAY_URL}" rel="noopener">Shop our eBay store</a>
     <a href="https://405rubbermulch.com">405RubberMulch.com &mdash; wholesale</a>
   </div>
 </div>
@@ -1450,9 +1453,10 @@ def build_pages(L):
             "than a builder-grade fan with brass trim and five bulbs, and nothing makes a room look ten years newer for "
             "less money. Do the whole house at closeout pricing and the difference shows in listing photos before it "
             "shows anywhere else &mdash; which is why flippers and landlords buy fans from us by the cartload.",
-            "We also stock ceiling fan parts, and we list one-off units and harder-to-find parts through our eBay store "
-            "under the Jameson's name. If a fan is otherwise fine and you need a blade arm, a downrod, or a remote "
-            "receiver, call before you replace the whole thing.",
+            "We also stock ceiling fan parts, and we list one-off units and harder-to-find parts through our eBay "
+            f"store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a>, which ships anywhere. If a fan "
+            "is otherwise fine and you need a blade arm, a downrod, or a remote receiver, call before you replace the "
+            "whole thing.",
         ],
         faq=[
             ("Where can I buy discount ceiling fans and light fixtures in the OKC metro?",
@@ -1619,8 +1623,9 @@ def build_pages(L):
             "Getting eighty percent of a project at closeout pricing is the win &mdash; nobody needs us to be the only "
             "stop, and we will tell you straight when we don't have the depth for your list.",
             "A few one-off units and harder-to-find parts, including ceiling fan parts, are listed online through our "
-            "eBay store under the Jameson's name. The floor is still where the volume is, but if you need a single "
-            "obscure part, that is often the fastest way to get it.",
+            f"eBay store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a> &mdash; 100% positive "
+            "feedback across hundreds of sales, and we ship those anywhere. The floor is still where the volume is, "
+            "but if you need a single obscure part, that is often the fastest way to get it.",
         ],
         extra=lambda L: f'<div style="margin:1.4rem 0">{cat_grid(L)}</div>' + f'''
 <div class="split" style="margin-top:1.2rem">
@@ -1865,6 +1870,7 @@ SAME_AS = [
     "https://www.instagram.com/jamesons_discount_mwc/",
     "https://www.youtube.com/@jamesonsdiscount",
     "https://www.youtube.com/@jamesonsdiscountsouthokc",
+    EBAY_URL,
 ]
 HOURS = [
     {"@type": "OpeningHoursSpecification",
