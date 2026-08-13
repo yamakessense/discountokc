@@ -46,7 +46,35 @@ straight into `assets/photos/` named after its hash.
 
 `build.py` reads each WebP's real dimensions at build time via `webp_size()`, a
 hand-rolled header parser, so every `<img>` carries width and height and the
-page doesn't jump as photos load. No image library needed on CI.
+page doesn't jump as photos load. No image library needed on CI — see below for
+where the resizing actually happens.
+
+## Adding a photo — tools/prep_photos.py
+
+The site build stays dependency-free on purpose. All resizing happens in
+`tools/prep_photos.py`, which runs **locally, never on CI**, and commits its
+output:
+
+```
+pip install pillow
+python3 tools/prep_photos.py add ~/Downloads/IMG_1234.jpg storefront-yukon
+python3 tools/prep_photos.py derive     # rebuild derivatives for everything
+```
+
+For each photo it writes `<name>.webp` capped at 1200px, plus `<name>@800.webp`
+and `<name>@400.webp`. `photo_tag()` looks for those two on disk and emits a
+`srcset` when they exist, so a phone downloads the 400px file to fill a 356px
+card instead of a 1200px one. Measured over five pages: 1407 KB before, 991 KB
+on a retina phone, 410 KB on a standard-density one.
+
+**It never upscales.** A source narrower than a derivative width is skipped, and
+a photo with no derivatives gets a plain `src` — so the srcset path and the
+no-srcset path are both correct and CI still needs no image library.
+
+Source resolution is the one thing the tool can't fix. `storefront-south-okc`
+(188×314) and `ceiling-fans-aisle` (188×189) came in as thumbnails and look soft
+on a high-DPI phone. If full-size originals ever turn up, `prep_photos.py add`
+over the same name is the whole job.
 
 The Wix CDN resize transforms do work (`/v1/fill/w_800,h_600,q_80/` appended to
 a media URL) if this is ever reversed.

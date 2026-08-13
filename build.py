@@ -918,18 +918,39 @@ def webp_size(path):
     raise ValueError("not a WebP: " + path)
 
 
+# Roughly what a .shots card measures at each breakpoint: one column on a
+# phone, two on a tablet, three or four on a desktop inside the container.
+PHOTO_SIZES = "(max-width:640px) 92vw, (max-width:1040px) 46vw, 400px"
+
+
 def photo_tag(filename, alt, cls="", eager=False):
     """Photos are committed to assets/photos/ — the site serves its own images.
 
     The originals still live in the Wix Media Manager; these are resized copies,
     so nothing there was moved or deleted.
+
+    tools/prep_photos.py writes `<id>@800.webp` and `<id>@400.webp` alongside
+    each main photo. Where those exist we emit a srcset, so a phone downloads
+    the 400px file instead of a 1200px one to fill a 356px card. Small photos
+    have no derivatives — the tool refuses to upscale — and simply get a plain
+    src, so this stays correct either way and the build still needs no image
+    library.
     """
     pid = photo_id(filename)
     w, h = webp_size(os.path.join(PHOTO_DIR, pid + ".webp"))
     load = ('fetchpriority="high" decoding="async"' if eager
             else 'loading="lazy" decoding="async"')
     c = f' class="{cls}"' if cls else ""
-    return (f'<img{c} src="{BASE}/assets/photos/{pid}.webp" alt="{alt}" '
+
+    srcset = []
+    for d in (400, 800):
+        if os.path.exists(os.path.join(PHOTO_DIR, f"{pid}@{d}.webp")):
+            srcset.append(f"{BASE}/assets/photos/{pid}@{d}.webp {d}w")
+    srcset.append(f"{BASE}/assets/photos/{pid}.webp {w}w")
+    ss = (f' srcset="{", ".join(srcset)}" sizes="{PHOTO_SIZES}"'
+          if len(srcset) > 1 else "")
+
+    return (f'<img{c} src="{BASE}/assets/photos/{pid}.webp"{ss} alt="{alt}" '
             f'width="{w}" height="{h}" {load}>')
 
 
