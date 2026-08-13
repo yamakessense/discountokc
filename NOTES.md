@@ -229,10 +229,27 @@ The facts, so nobody softens them into vagueness later:
   supply chain is slow and expensive and product sits waiting its turn. We are
   the local infrastructure that clears the bottleneck. Big-box stores,
   manufacturers and distribution centers are the audience for that sentence.
-- **Trailer clear-outs** — scratch-and-dent, bender buybacks and the rest.
-  `bender buybacks` is trade vernacular and stays as the owner says it.
+- **Trailer clear-outs** — scratch-and-dent, **vendor buybacks** and the rest.
+  It is *vendor*, never "bender". An autocorrect put "bender buybacks" on the
+  page in Aug 2026 and it survived a round of review because it reads like trade
+  slang. It isn't a term. The trade audience this paragraph is written for would
+  have spotted it immediately.
 
 Everything routes to `b2b@discountokc.com`. Keep that address on both pages.
+
+## Never strip the head
+
+Do not remove Google verification tags, tracking scripts, or meta tags when
+editing `full_page()` or the 404/preview templates. Search Console for
+discountokc.com is verified by **DNS TXT record**, not by an HTML tag (see
+CUTOVER.md), so there is no verification meta tag in the markup today — but that
+can change the moment somebody adds a second property or a tag manager, and a
+verification tag deleted by accident is silent until rankings move.
+
+Current head, per built page: 19 `<meta>` tags (viewport, description, robots,
+Open Graph, Twitter card, theme-color) and 3–4 `<script>` tags (JSON-LD, search,
+nav cue, and the video script on pages that carry one). No analytics or tag
+manager is installed on this site at present.
 
 ## Condition language
 

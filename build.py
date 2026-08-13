@@ -2214,7 +2214,7 @@ def build_pages(L):
             "Got something to sell? We are the local infrastructure a lot of big-box stores, manufacturers and "
             "distribution centers are looking for. Routing goods back up the supply chain is slow and expensive, and "
             "product sits while it waits its turn. We clear that bottleneck. We take return-to-vendor and reverse "
-            "logistics center goods all the time, and local businesses fill a trailer with scratch-and-dent, bender "
+            "logistics center goods all the time, and local businesses fill a trailer with scratch-and-dent, vendor "
             "buybacks and the rest and call us to get it moving. That keeps the river of goods flowing instead of "
             "parked in somebody's warehouse.",
             "Manufacturer, distributor, builder, contractor, or a store with a back room that needs clearing &mdash; "
@@ -2249,7 +2249,7 @@ def build_pages(L):
             ("Do you accept return-to-vendor or reverse logistics goods?",
              "All the time. Routing goods back up the supply chain is slow and expensive, and product sits while it "
              "waits its turn. We take RTV and reverse logistics center loads, and local businesses fill a trailer "
-             "with scratch-and-dent, bender buybacks and the rest and call us to get it moving."),
+             "with scratch-and-dent, vendor buybacks and the rest and call us to get it moving."),
             ("How is a closeout store part of the circular economy?",
              "Everything we buy was already manufactured and would otherwise have been written off, remaindered or "
              "landfilled — cancelled builder orders, discontinued lines, overstock a distributor needs off the "
@@ -2309,7 +2309,7 @@ def build_pages(L):
             "end-of-line lots, mostly outright and up front &mdash; one price, one pickup. On specialty equipment, "
             "surplus construction material and job-site leftovers we will also take inventory on consignment and let "
             "the market set the price. We take return-to-vendor and reverse logistics center goods all the time, and "
-            "local businesses fill a trailer with scratch-and-dent, bender buybacks and the rest and call us to get "
+            "local businesses fill a trailer with scratch-and-dent, vendor buybacks and the rest and call us to get "
             "it moving. Send details to <a href=\"mailto:b2b@discountokc.com\">b2b@discountokc.com</a>.",
         ],
         extra=lambda L: '''
@@ -2340,7 +2340,7 @@ def build_pages(L):
              "and reverse logistics loads — mostly outright and up front, sometimes on consignment. Send what you "
              "have, roughly how much of it, and where it sits."),
             ("Will you clear out a warehouse or a back room?",
-             "Yes, that's a routine job for us. Local businesses fill a trailer with scratch-and-dent, bender "
+             "Yes, that's a routine job for us. Local businesses fill a trailer with scratch-and-dent, vendor "
              "buybacks and the rest and call us to get it moving. Email b2b@discountokc.com with what's there."),
         ]))
 
