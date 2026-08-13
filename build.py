@@ -1263,6 +1263,10 @@ def build_pages(L):
             "line between DIY and pro work. If your new vanity matches the footprint of the old one and the supply "
             "lines and drain line up, most handy homeowners can do the swap in an afternoon. Moving plumbing, cutting "
             "into a stone top, or going from a 30-inch to a 60-inch cabinet is where a licensed plumber earns the fee.",
+            "On the floor right now: a 60-inch double vanity with an engineered stone top, $629. It is a modular unit, "
+            "so two cabinets sit side by side under one top &mdash; which means you can build the same run out to 72 or "
+            "84 inches by adding a section, for less than a custom cabinet shop would charge for the base alone. For a "
+            "primary bath or a flip where two sinks sell the room, that is the cheapest double-vanity math in the metro.",
             "Because vanities come in as closeout lots, what's on the floor is what's available &mdash; there's no "
             "back room and no reorder. If you see the one you want at the price you want, that's the day to buy it. "
             "Call either store and staff will walk the floor and tell you what's actually there before you drive out.",
@@ -1335,6 +1339,11 @@ def build_pages(L):
             "swapping a faucet or installing a new toilet takes basic tools and an afternoon. Replacing a bathtub or "
             "moving supply lines is where a licensed plumber is the right call. The math works the same either way "
             "&mdash; labor costs what it costs, so buying the fixture at closeout price is where you win.",
+            "If you are pricing a shower, compare the panel systems against tile before you commit. Shower wall panels "
+            "at closeout pricing beat a tiled surround on both material and labor, and they beat it badly once you "
+            "count waterproofing, grout and a tile setter's day rate. The same logic runs through the whole remodel: "
+            "waterproof LVP over tile on the floor, panels over tile on the wall, and the money you save on labor is "
+            "the money that buys the fixtures.",
             "Selection changes fast. Call either store and staff will tell you what's on the floor right now.",
         ],
         faq=[
@@ -1398,6 +1407,13 @@ def build_pages(L):
             "mount the bracket. If a room needs new circuits or you're not comfortable at the panel, a licensed "
             "electrician is the right call. Fixture-for-fixture swaps at closeout prices are how a whole house gets a "
             "lighting refresh for the cost of two or three fixtures at full retail.",
+            "If you only change one thing in a dated house, change the ceiling fans. Nothing reads &ldquo;old&rdquo; faster "
+            "than a builder-grade fan with brass trim and five bulbs, and nothing makes a room look ten years newer for "
+            "less money. Do the whole house at closeout pricing and the difference shows in listing photos before it "
+            "shows anywhere else &mdash; which is why flippers and landlords buy fans from us by the cartload.",
+            "We also stock ceiling fan parts, and we list one-off units and harder-to-find parts through our eBay store "
+            "under the Jameson's name. If a fan is otherwise fine and you need a blade arm, a downrod, or a remote "
+            "receiver, call before you replace the whole thing.",
         ],
         faq=[
             ("Where can I buy discount ceiling fans and light fixtures in the OKC metro?",
@@ -1490,6 +1506,13 @@ def build_pages(L):
             "every spring, and holds its fall-height rating far longer than wood chips. For playground use, depth is "
             "what matters &mdash; check the fall height of your equipment and buy to that depth, and add a bit for "
             "settling and displacement under swings and slides.",
+            "Blue bagged mulch is carried locally &mdash; if you have been sourcing it out of state or waiting on "
+            "freight, it is on the floor here.",
+            "Schools are a large part of what we move. District playgrounds and HOA common areas across Oklahoma buy "
+            "from us season after season, because the certification paperwork is straightforward, the pickup window is "
+            "flexible, and the price per fall-height rating beats engineered wood fiber over any multi-year horizon. "
+            "If you are an HOA board or a district facilities manager pricing a play surface, call and ask for the "
+            "volume number rather than the shelf price.",
             "Buying for a school, city park or a big install? That's what our wholesale arm is for. "
             "405RubberMulch.com delivers flatbed truckloads across Oklahoma, Kansas, Missouri and Arkansas.",
         ],
@@ -1551,6 +1574,17 @@ def build_pages(L):
             "specific models rotate constantly &mdash; but the categories below are core stock at both stores "
             "year-round. If you want to know whether a particular kind of item is on the floor today, calling is "
             "faster than driving: 405-206-8111 in Midwest City, 405-479-7918 in South OKC.",
+            "You do not have to buy everything here for us to save you money. On a kitchen, most people take the "
+            "cabinets from us and pick up the last two fillers and a trim piece at a big box store. On a whole-house "
+            "lighting update, they take every ceiling fan from us and buy the one odd-size flush mount elsewhere. "
+            "Getting eighty percent of a project at closeout pricing is the win &mdash; nobody needs us to be the only "
+            "stop, and we will tell you straight when we don't have the depth for your list.",
+            "Holiday decor is a real department here, not an afterthought. Trees, lighting and seasonal decor move in "
+            "volume every year at a fraction of seasonal retail, and it lands early &mdash; if you are decorating a "
+            "storefront, an office or a big front yard, come before the picked-over weeks.",
+            "A few one-off units and harder-to-find parts, including ceiling fan parts, are listed online through our "
+            "eBay store under the Jameson's name. The floor is still where the volume is, but if you need a single "
+            "obscure part, that is often the fastest way to get it.",
         ],
         extra=lambda L: f'<div style="margin:1.4rem 0">{cat_grid(L)}</div>' + f'''
 <div class="split" style="margin-top:1.2rem">
@@ -1627,6 +1661,16 @@ def build_pages(L):
             "&mdash; the discount comes from how we buy, not from what it is.",
             "That's also why the floor changes constantly. There's no catalog and no back stock: when a lot is gone, "
             "it's gone, and something else is in its place. Customers who check in regularly do the best.",
+            "Ten years in, we're a leader in the circular economy in this market, and we mean that literally rather "
+            "than as a slogan. Every truckload we buy is product that was already made and would otherwise have been "
+            "written off, remaindered or landfilled &mdash; cancelled builder orders, discontinued lines, overstock a "
+            "distributor needs off the floor. Selling it at half retail keeps it in service in Oklahoma homes instead "
+            "of in a waste stream. Our paint line works the same way: Visions Quality Coatings remanufactures premium "
+            "post-consumer material that would otherwise be disposed of.",
+            "We buy as well as sell, and we source locally where we can. If you're a manufacturer, distributor, "
+            "builder or contractor sitting on a cancelled order, a discontinued line, a closeout lot or a warehouse "
+            "you need cleared, we'll look at it. Reach the sales department at "
+            "<a href=\"mailto:b2b@discountokc.com\">b2b@discountokc.com</a>.",
             "The mulch side of the business scales all the way up. 405RubberMulch.com is our regional wholesale arm, "
             "delivering flatbed truckloads of IPEMA-certified playground rubber mulch to schools, cities and "
             "contractors across Oklahoma, Kansas, Missouri and Arkansas &mdash; while the retail stores keep bags and "
@@ -1692,6 +1736,9 @@ def build_pages(L):
   <div class="btnrow"><a class="btn btn-ink" href="tel:+14054797918">Call this store</a></div></div>
   <div class="card"><span class="eyebrow">Email &amp; wholesale</span><h3>save@discountokc.com</h3>
   <p>General questions by email. Truckload rubber mulch quotes: <a href="https://405rubbermulch.com">405RubberMulch.com</a>.</p></div>
+  <div class="card"><span class="eyebrow">Sell to us &middot; B2B</span><h3>b2b@discountokc.com</h3>
+  <p>We buy closeout, overstock, cancelled orders and discontinued lines, and we source locally. Manufacturers,
+  distributors, builders and contractors with a lot to move &mdash; send it here.</p></div>
 </div>''',
         faq=[
             ("What's the best way to reach Jameson's?",
