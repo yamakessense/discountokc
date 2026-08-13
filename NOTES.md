@@ -100,6 +100,37 @@ or in the build output). Two non-Wix dependencies remain:
 Self-hosting the three fonts into `assets/` is the higher-value of the two and
 would make the site fully self-contained.
 
+## How the site talks
+
+Humble and hard-working. State the thing and stop.
+
+The failure mode to watch for is the clever summing-up clause — the sentence
+that lands a point and then explains why it was a good point. "That's what
+makes the math work." "That's what squares it." "Which is why X." "That's good
+news if you do A and bad news if you do B." "That is the whole reason X beats
+Y." None of that is how the owner talks, and it reads as AI filler. A pass in
+Aug 2026 removed six of them.
+
+Rewrite by saying the plain version: not "that is the whole reason LVP beats
+tile on a budget: the material is cheaper here and the labor is you," but "on a
+budget, LVP usually comes out ahead of tile: the material costs less and you
+are not paying anyone to install it."
+
+## Pricing model
+
+The discounts are up front. The tag price is the low price — there is no sale
+cycle to wait for and no coupon. A single item may go on sale in a given month,
+but our prices are our prices. Don't write copy implying a weekly or seasonal
+sale rhythm.
+
+Two things that do move below the tag, both worth stating plainly and neither
+advertised week to week:
+
+- **10% military discount on brand-new running-line vinyl plank.** Current
+  product, not closeout overage. Do not widen this to the whole store.
+- **Take-all deals on the last of a line**, which on flooring can mean pallet
+  pricing on a style or two.
+
 ## Condition language
 
 The site used to claim inventory was "not seconds, not returns." It isn't — the

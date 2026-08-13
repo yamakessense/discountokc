@@ -1443,8 +1443,8 @@ def build_pages(L):
             "material bought at closeout costs the same to install as material bought at full retail.",
             "You can absolutely do this yourself. Click-lock luxury vinyl plank snaps together by hand, and you cut it "
             "with a box knife &mdash; score the surface, snap the plank, no wet saw, no tile setter, no mortar. Most "
-            "rooms are a weekend. That is the whole reason LVP beats tile on a budget: the material is cheaper here, "
-            "and the labor is you.",
+            "rooms are a weekend. On a budget, LVP usually comes out ahead of tile: the material costs less and you "
+            "are not paying anyone to install it.",
             "The one spec worth understanding before you buy is the wear layer, and it is the number most people "
             "ignore. It is the clear protective film on top, measured in mils, and it &mdash; not the price, not the "
             "thickness of the plank, not how the photo looks &mdash; is what decides how long the floor survives. "
@@ -1456,6 +1456,11 @@ def build_pages(L):
             "Because our inventory comes from truckload closeouts, surplus lots arrive continuously and sell fast. If "
             "you're calculating square footage for a project, call ahead or stop by &mdash; staff can tell you what's "
             "on the floor and how much of it is left.",
+            "Two things worth asking about at the counter. We take <b>10% off for military</b> on brand-new "
+            "running-line vinyl plank &mdash; current product, not closeout overage. And when a line gets down to the "
+            "last of it, we will often do a take-all deal on what's left, which on flooring can mean pallet pricing "
+            "on a style or two. Neither is posted on a sign. If you are doing a whole house, tell staff how many "
+            "square feet you need before you start pricing it out.",
         ],
         faq=[
             ("Is there LVP flooring under $2.50 a square foot in Oklahoma City?",
@@ -1476,7 +1481,14 @@ def build_pages(L):
              "savings on installation are usually larger than the savings on the material."),
             ("How much should I buy?",
              "Measure your square footage and add roughly 10% for cuts and waste. Staff at either store can help you "
-             "check the math against what's in stock."),
+             "check that against what's in stock."),
+            ("Do you offer a military discount on flooring?",
+             "Yes — 10% off brand-new running-line vinyl plank. That's current product rather than closeout overage. "
+             "Ask at the counter at either store."),
+            ("Do you offer pallet pricing on flooring?",
+             "Sometimes. When a line gets down to the last of it we'll often do a take-all deal on what's left, and "
+             "on flooring that can mean pallet pricing on a style or two. It isn't advertised, so tell staff how many "
+             "square feet you need and they'll tell you what they can do."),
             ("What if the style I want sells out mid-project?",
              "Closeout lots are finite — buy the full quantity for your project up front. Call Midwest City at "
              "405-206-8111 or South OKC at 405-479-7918 to confirm current pallet quantities."),
@@ -1577,8 +1589,8 @@ def build_pages(L):
             "lighting refresh for the cost of two or three fixtures at full retail.",
             "If you only change one thing in a dated house, change the ceiling fans. Nothing reads &ldquo;old&rdquo; faster "
             "than a builder-grade fan with brass trim and five bulbs, and nothing makes a room look ten years newer for "
-            "less money. Do the whole house at closeout pricing and the difference shows in listing photos before it "
-            "shows anywhere else &mdash; which is why flippers and landlords buy fans from us by the cartload.",
+            "less money. Landlords and folks fixing up a house to sell buy fans from us by the cartload, usually a "
+            "whole house at a time.",
             "Ceiling fans are the deepest single category in the building. We carry a full variety &mdash; Home "
             "Decorators Collection, Hunter, Glacier Bay, Project Source, Kichler and many more &mdash; in indoor and "
             "outdoor styles, with and without lights, from small-room sizes up to great-room spans. At times we have "
@@ -1586,13 +1598,13 @@ def build_pages(L):
             "Some of those fans are open-box, and some came back to a big-box store as returns. What is worth knowing "
             "is <em>why</em> they came back. A large share of returned ceiling fans were never faulty: the handheld "
             "remote was never paired to the receiver in the canopy, or the fan was wired as if it were on a single "
-            "switch when the room is actually on a three-way. Those are setup problems, not product problems &mdash; "
-            "and they send a perfectly good fan back to the returns desk in its original box. Most of the time it is "
+            "switch when the room is actually on a three-way. Those are setup problems, not product problems, and "
+            "they send a perfectly good fan back to the returns desk in its original box. Most of the time it is "
             "not the fan.",
-            "We have also moved to a velocity-first model: price it to move and keep the floor turning. On fans that "
-            "can mean opening the box and inspecting the unit with you right at checkout rather than holding stock "
-            "back for a bench test. You see what you are buying before it goes in the truck, and the line keeps "
-            "moving. Ask at the counter and we will go through it with you.",
+            "We work on a velocity-first model these days &mdash; price it to move and keep the floor turning &mdash; "
+            "so we don't hold fans back for a bench test before they go out. Instead we will open the box and look "
+            "the unit over with you right at the counter, so you see what you are buying before you load it. Just "
+            "ask and we will go through it with you.",
             "We also stock ceiling fan parts, and we list one-off units and harder-to-find parts through our eBay "
             f"store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a>, which ships anywhere. If a fan "
             "is otherwise fine and you need a blade arm, a downrod, or a remote receiver, call before you replace the "
@@ -1672,8 +1684,8 @@ def build_pages(L):
         paras=[
             "Jameson's carries name-brand power tools and hand tools &mdash; brands like Milwaukee among them &mdash; "
             "at closeout prices well below big-box retail. Tool inventory is the most fast-moving category in the "
-            "store: closeout lots land, get priced to move, and go. That's good news if you check in regularly and "
-            "bad news if you wait a week on the drill you saw.",
+            "store: closeout lots land, get priced to move, and go. If you saw a drill you wanted, don't wait a week "
+            "on it &mdash; it may not be here.",
             "For DIYers gearing up for the projects on our other pages &mdash; flooring installs, faucet swaps, vanity "
             "replacements &mdash; this is the cheapest way to build the kit. Contractors grabbing backup or crew tools "
             "do well here too.",
@@ -1746,7 +1758,7 @@ def build_pages(L):
             "flexible, and the price per fall-height rating beats engineered wood fiber over any multi-year horizon. "
             "If you are an HOA board or a district facilities manager pricing a play surface, call and ask for the "
             "volume number rather than the shelf price.",
-            "Buying for a school, city park or a big install? That's what our wholesale arm is for. "
+            "Buying for a school, city park or a big install? Our wholesale side handles those. "
             "405RubberMulch.com delivers flatbed truckloads across Oklahoma, Kansas, Missouri and Arkansas.",
         ],
         faq=[
@@ -1810,11 +1822,11 @@ def build_pages(L):
             "You do not have to buy everything here for us to save you money. On a kitchen, most people take the "
             "cabinets from us and pick up the last two fillers and a trim piece at a big box store. On a whole-house "
             "lighting update, they take every ceiling fan from us and buy the one odd-size flush mount elsewhere. "
-            "Getting eighty percent of a project at closeout pricing is the win &mdash; nobody needs us to be the only "
-            "stop, and we will tell you straight when we don't have the depth for your list.",
+            "We don't need to be your only stop, and we will tell you straight when we don't have the depth for "
+            "your list.",
             "What we don't carry is worth saying plainly, because it saves you a trip. Windows and screen doors are "
-            "the main ones. Both are specialty custom items, sized and ordered to the opening, and that is not a "
-            "business you can run off closeout truckloads. We don't stock them and we won't pretend otherwise "
+            "the main ones. Both are specialty custom items, sized and ordered to the opening, which is not something "
+            "we can buy by the truckload. We don't stock them and we won't pretend otherwise "
             "&mdash; but ask at the counter and staff will point you to a few local companies instead.",
             "A few one-off units and harder-to-find parts, including ceiling fan parts, are listed online through our "
             f"eBay store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a> &mdash; 100% positive "
@@ -1859,9 +1871,16 @@ def build_pages(L):
         chips=[("$500", "supersack, summer special"), ("$21.99", "Visions paint, per gallon"),
                ("$2.19+", "waterproof LVP, per sq ft")],
         paras=[
-            "Closeout pricing isn't a sale that ends Sunday &mdash; it's how the whole store is bought. Below are the "
-            "standing prices worth planning around. Everything else is whatever came off the truck this week, which "
-            "is why it pays to stop in regularly or follow us on Facebook and Instagram.",
+            "We put our discounts up front. That is the business model: the price on the tag is already the low "
+            "price, so there is no sale cycle to wait for and no coupon to hunt down. We may run a sale on one thing "
+            "in a given month, but for the most part our prices are our prices. Below are the standing ones worth "
+            "planning around. Everything else is whatever came off the truck this week, so it pays to stop in "
+            "regularly or follow us on Facebook and Instagram.",
+            "Two things do move below the tag. We offer a <b>10% military discount on brand-new running-line vinyl "
+            "plank</b> &mdash; current product, not closeout overage. And when we get down to the last of a line we "
+            "will often do a take-all deal on what's left, which on flooring can mean pallet pricing on a style or "
+            "two. Neither is advertised week to week; ask at the counter, and if you are buying a whole house of "
+            "flooring say so up front.",
             "Seasonal and holiday decor runs alongside all of it &mdash; trees, lighting and decor at a fraction of "
             "seasonal retail, and it lands early rather than late. If you are decorating a storefront, an office or a "
             "big front yard, come before the picked-over weeks.",
@@ -1887,8 +1906,16 @@ def build_pages(L):
 </div>''',
         faq=[
             ("Do you run weekly sales?",
-             "The whole store is priced off closeout buying, so there's no weekly sale cycle. New lots arrive weekly "
-             "and are priced to move when they hit the floor."),
+             "We put our discounts up front, so the tag price is already the low price and there's no weekly sale "
+             "cycle to wait for. We may run a sale on one item in a given month, but mostly our prices are our "
+             "prices. New lots arrive weekly and are priced to move when they hit the floor."),
+            ("Do you offer a military discount?",
+             "Yes — 10% off brand-new running-line vinyl plank flooring. That's on current product, not closeout "
+             "overage. Ask at the counter at either store."),
+            ("Do you give a better price on large quantities?",
+             "Often, yes. When we get down to the last of a line we'll do a take-all deal on what's left, and on "
+             "flooring that can mean pallet pricing on a style or two. It isn't advertised — tell staff up front how "
+             "much you need and they'll tell you what they can do."),
             ("How do I find out what just came in?",
              "Follow us on Facebook and Instagram, or call the store: 405-206-8111 Midwest City, 405-479-7918 South OKC."),
             ("Are the specials at both stores?",
