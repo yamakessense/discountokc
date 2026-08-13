@@ -1841,8 +1841,12 @@ def strip(t):
 # lat/lng geocoded from the street addresses via OpenStreetMap Nominatim.
 # maps_q is the same Google Maps address query the "Get directions" buttons use.
 STORES = [
+    # founded is the business's founding year, carried on the primary entity that
+    # the other nodes point at as publisher/parent - not a claim about when this
+    # particular building opened.
     dict(_id="#midwest-city", tel="+1-405-206-8111", street="7010 SE 15th Street",
          city="Midwest City", zipc="73110", lat=35.4495875, lng=-97.4043231,
+         founded="2016",
          maps_q="7010+SE+15th+Street+Midwest+City+OK+73110",
          desc="Closeout home improvement warehouse with name-brand products up to 50% off retail. "
               "Vanities, flooring, bath, kitchen, lighting, tools, patio and more. Home of Big Jim, "
@@ -1885,6 +1889,8 @@ def store_nodes():
             "currenciesAccepted": "USD",
             "sameAs": SAME_AS,
         })
+        if s.get("founded"):
+            out[-1]["foundingDate"] = s["founded"]
     out.append({
         "@type": "Organization", "@id": "https://405rubbermulch.com/#org", "name": "405RubberMulch.com",
         "url": "https://405rubbermulch.com",
