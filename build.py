@@ -334,6 +334,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 .crumbs .sep{color:var(--ink-300);display:flex}
 .crumbs .sep svg{width:14px;height:14px}
 .crumbs .cur{color:var(--ink-800);font-weight:var(--fw-semibold)}
+/* On a phone the current crumb repeats the H1 immediately below it word for
+   word — up to 70 characters over two lines before the heading even starts.
+   Kept in the DOM for crawlers, clamped to one line for thumbs. */
+@media(max-width:760px){
+  .crumbs{font-size:14px;flex-wrap:nowrap;margin-bottom:var(--space-3)}
+  .crumbs a{white-space:nowrap}
+  .crumbs .cur{
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+  }
+}
 
 /* ---------- Accordion / FAQ ----------
    Rendered as <details>/<summary> so every answer is in the DOM for crawlers
@@ -363,13 +373,22 @@ button,input,select,textarea{font:inherit;color:inherit}
 .topbar{background:var(--blue-700);color:#fff;font-size:13px}
 .topbar .wrap{
   display:flex;align-items:center;justify-content:space-between;
-  gap:var(--space-2) var(--space-4);flex-wrap:wrap;padding:7px 0;
+  gap:var(--space-2) var(--space-4);flex-wrap:wrap;
+  padding-block:7px;
 }
 .topbar .tb-left,.topbar .tb-right{display:flex;align-items:center;gap:var(--space-2) var(--space-5);flex-wrap:wrap}
 .topbar a,.topbar span{display:inline-flex;align-items:center;gap:6px;color:#fff}
 .topbar a{font-weight:var(--fw-medium);opacity:.92}
 .topbar a:hover{color:#fff;opacity:1;text-decoration:underline}
-@media(max-width:760px){.topbar .wrap{justify-content:center;text-align:center}}
+@media(max-width:760px){
+  .topbar .wrap{justify-content:center;text-align:center;padding-block:0}
+  /* 20px-tall links were the hardest thing on the page to hit, and the phone
+     number is the conversion. Pad both to the 44px touch minimum, and size up
+     only the links — the tagline stays 13px so its hours don't orphan a line. */
+  .topbar .tb-right{gap:0 var(--space-4);font-size:14px}
+  .topbar .tb-right a{min-height:44px;padding:0 4px}
+  .topbar .tb-left{padding:7px 0}
+}
 
 /* ---------- masthead ---------- */
 .masthead{background:#fff;position:sticky;top:0;z-index:60;border-bottom:1px solid var(--color-border)}
@@ -398,6 +417,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   font-family:var(--font-display);font-weight:var(--fw-semibold);font-size:15px;
   color:var(--blue-700);background:#fff;border:1.5px solid var(--ink-200);
   border-radius:var(--radius-pill);padding:11px 22px;line-height:1;
+  min-height:44px;box-sizing:border-box;
 }
 .hdr-call:hover{border-color:var(--blue-400);background:var(--blue-50);text-decoration:none}
 @media(max-width:860px){
@@ -410,12 +430,12 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- category nav ----------
    The AEO Hub styles navigation as text pills on white rather than a solid
    blue bar; with ten categories plus search they sit on their own row. */
-.catnav{background:#fff;border-bottom:1px solid var(--color-border)}
+.catnav{background:#fff;border-bottom:1px solid var(--color-border);position:relative}
 .catnav ul{display:flex;list-style:none;overflow-x:auto;scrollbar-width:none;gap:var(--space-1);padding:var(--space-2) 0}
 .catnav ul::-webkit-scrollbar{display:none}
 .catnav a{
   display:flex;align-items:center;gap:7px;white-space:nowrap;
-  padding:8px 12px;border-radius:var(--radius-md);
+  min-height:44px;padding:8px 12px;border-radius:var(--radius-md);
   color:var(--ink-700);font-weight:var(--fw-semibold);font-size:14px;
   transition:background var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard);
 }
@@ -424,6 +444,25 @@ button,input,select,textarea{font:inherit;color:inherit}
 .catnav a.on:hover{background:var(--blue-600);color:#fff}
 .catnav svg{width:18px;height:18px;flex:none}
 @media(max-width:900px){.catnav ul{justify-content:flex-start}}
+
+/* Ten categories do not fit a phone, so the strip swipes sideways. With no
+   edge cue a phone visitor reads the store as three departments instead of
+   ten. This fade says "more this way"; nav_script() adds .catnav-more only
+   while the strip actually overflows and removes it at the end of travel. */
+.catnav::before,.catnav::after{
+  content:"";position:absolute;top:0;bottom:1px;width:56px;
+  pointer-events:none;opacity:0;
+  transition:opacity var(--dur-fast) var(--ease-standard);
+}
+.catnav::after{
+  right:0;background:linear-gradient(to right,rgba(255,255,255,0),#fff 72%);
+}
+.catnav::before{
+  left:0;z-index:1;background:linear-gradient(to left,rgba(255,255,255,0),#fff 72%);
+}
+.catnav.catnav-more::after{opacity:1}
+.catnav.catnav-less::before{opacity:1}
+@media(prefers-reduced-motion:reduce){.catnav::before,.catnav::after{transition:none}}
 
 /* ---------- ticket / deal strip ---------- */
 .ticket{background:var(--cream-50);border-bottom:1px solid var(--color-border)}
@@ -919,6 +958,27 @@ def search_script(L):
             "r.hidden=false});"
             "document.addEventListener('click',function(e){const r=document.getElementById('qr');"
             "if(r&&!e.target.closest('.search')){r.hidden=true}});</script>")
+
+
+def nav_script():
+    """Edge cue for the category strip.
+
+    Ten categories need 1075px and a phone gives them ~358px, so seven sit
+    off-screen with nothing to say so. This marks the strip while there is
+    more to the right and clears the mark at the end of travel, so the fade
+    never shows on a desktop where every category already fits.
+    """
+    return ("<script>(function(){var n=document.querySelector('.catnav');"
+            "if(!n)return;var u=n.querySelector('ul');if(!u)return;"
+            "function sync(){"
+            "n.classList.toggle('catnav-more',u.scrollWidth-u.clientWidth-u.scrollLeft>8);"
+            "n.classList.toggle('catnav-less',u.scrollLeft>8)}"
+            "u.addEventListener('scroll',sync,{passive:true});"
+            "window.addEventListener('resize',sync);"
+            "if(window.ResizeObserver){new ResizeObserver(sync).observe(u)}"
+            "var on=u.querySelector('a.on');"
+            "if(on&&on.scrollIntoView){on.scrollIntoView({block:'nearest',inline:'center'})}"
+            "sync()})();</script>")
 
 
 def topbar(L):
@@ -2091,6 +2151,7 @@ def full_page(p, body, L):
 </main>
 {footer(L)}
 {search_script(L)}
+{nav_script()}
 {VIDEO_SCRIPT if VIDEOS.get(p['slug']) else ''}
 </body>
 </html>
@@ -2141,7 +2202,7 @@ def build_deploy():
 <link rel="icon" href="{BASE}/assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="{BASE}/assets/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="{BASE}/assets/apple-touch-icon.png"></head><body>
-{topbar(dep_link)}{masthead(dep_link)}{catnav(dep_link,'')}<main>{body404}</main>{footer(dep_link)}</body></html>''')
+{topbar(dep_link)}{masthead(dep_link)}{catnav(dep_link,'')}<main>{body404}</main>{footer(dep_link)}{nav_script()}</body></html>''')
 
     with open(os.path.join(SITEDIR, "sitemap.xml"), "w", encoding="utf-8") as f:
         today = __import__("datetime").date.today().isoformat()

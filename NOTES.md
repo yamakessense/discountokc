@@ -55,6 +55,51 @@ a media URL) if this is ever reversed.
 hosting the live discountokc.com until DNS cutover. The website itself no longer
 depends on it at all.
 
+## Mobile is the primary surface (Aug 2026)
+
+Phones are the biggest traffic source, so the site is measured at 390×844
+before anything ships. Four things were fixed:
+
+**The category strip was hiding seven of ten departments.** Ten categories need
+1075px; a phone gives them 358px. Vanities, Flooring and Bath showed; Kitchen,
+Patio, Lights & Fans, Tools, Other, Deals and Mulch sat off the right edge with
+no fade, arrow or peeking chip to say the strip swipes. A phone visitor read the
+store as a three-department shop. `.catnav::before/::after` are now edge fades,
+toggled by `nav_script()` — `.catnav-more` while there is travel to the right,
+`.catnav-less` to the left. Neither ever shows on desktop, where all ten fit.
+`nav_script()` also centres the active pill, so deep categories like Mulch open
+with their pill in view.
+
+**Tap targets.** Category links were 37px, the top-bar links 20px, the masthead
+Call button 42px — all under the 44px floor. All three are now 44px minimum. The
+top bar grew ~48px doing it, which is acceptable because it is *not* sticky
+(only `.masthead` is), so that cost lands once on the first screen.
+
+**Type.** The top-bar links went 13px → 14px. The tagline beside them stays 13px
+on purpose: at 14px "Tue–Sat 9–6, Sun 10–6" wraps and orphans the final "6".
+
+**Breadcrumbs.** On a category page the current crumb repeated the H1 word for
+word — up to 70 characters over two lines directly above the same words. It is
+still in the DOM for crawlers, now clamped to one line with an ellipsis.
+
+Use `padding-block`, not the `padding` shorthand, on anything inside `.wrap` —
+the shorthand wipes `.wrap`'s `padding-inline: var(--gutter)` and the content
+goes edge to edge on a phone.
+
+## Still loaded from third parties
+
+Nothing comes from Wix — all 29 photos are local and verified (29 referenced,
+29 on disk, 0 HTTP failures, zero `wixstatic`/`wix.com` references in `build.py`
+or in the build output). Two non-Wix dependencies remain:
+
+| What | Where | Cost |
+|---|---|---|
+| Google Fonts CSS (Archivo, Public Sans, Spline Sans Mono) | every page | render-blocking third-party request before text paints |
+| YouTube thumbnails (`i.ytimg.com`) | 16 images across 9 pages | a separate connection per thumbnail |
+
+Self-hosting the three fonts into `assets/` is the higher-value of the two and
+would make the site fully self-contained.
+
 ## Condition language
 
 The site used to claim inventory was "not seconds, not returns." It isn't — the
