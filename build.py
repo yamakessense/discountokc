@@ -616,7 +616,14 @@ main section.tight{padding-top:0}
     border-color var(--dur-base),transform var(--dur-base);
 }
 .shot:hover{box-shadow:var(--shadow-md);border-color:var(--blue-200);transform:translateY(-2px)}
-.shot img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+/* height:auto is load-bearing. photo_tag() puts real width/height attributes on
+   every <img> to stop the page jumping as photos load, but the height attribute
+   is a presentational hint that beats aspect-ratio — so the 16/10 crop below was
+   never actually happening and a 1200x900 photo rendered as a 900px-tall card,
+   taller than a phone screen. With height:auto the aspect-ratio wins, the crop
+   works as designed, and the reserved box still matches the final box, so
+   nothing jumps. */
+.shot img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;display:block}
 
 /* ---------- locations ---------- */
 .locs{background:var(--blue-800);color:var(--cream-50)}
@@ -754,6 +761,13 @@ TRUST = [
 # Add or swap a page's photos by editing this map — nothing to upload.
 PHOTOS = {
   "": [
+    # Both storefronts lead the home strip: people navigate to this store by
+    # landmark, not by street number. The blue building and the supersack out
+    # front are how you know you're in the right parking lot.
+    ("storefront-midwest-city.jpg",
+     "Jameson's Discount Home Improvement in Midwest City &mdash; the long blue building on SE 15th Street"),
+    ("storefront-south-okc.jpg",
+     "Jameson's south OKC store on S. Santa Fe Ave, with a rubber mulch supersack out front"),
     ("0172ec_7c1877925d9241b185132d3eef5d643c~mv2_d_3264_2448_s_4_2.jpg",
      "Inside Jameson's Discount Home Improvement Warehouse in the Oklahoma City metro"),
     ("0172ec_e2e8bcf26b224e18ab6e5f771118fce2~mv2.jpeg",
@@ -792,6 +806,8 @@ PHOTOS = {
      "Name-brand kitchen fixtures bought as closeout lots"),
   ],
   "lighting": [
+    ("ceiling-fans-aisle.jpg",
+     "Boxed ceiling fans stacked down the aisle at Jameson's &mdash; at times a thousand fans in stock"),
     ("0172ec_b71f73ea9eae4be1ab2dfa7df6114a1f~mv2.jpg",
      "Light fixtures and chandeliers at up to 50% off retail"),
     ("0172ec_d9f5160cec5b48508823a38e48026172~mv2.jpg",
@@ -854,6 +870,10 @@ PHOTOS = {
      "Closeout home improvement stock on the warehouse floor"),
   ],
   "location": [
+    ("storefront-midwest-city.jpg",
+     "The Midwest City store at 7010 SE 15th Street &mdash; look for the long blue building"),
+    ("storefront-south-okc.jpg",
+     "The south OKC store at 8100 S. Santa Fe Ave, near I-240"),
     ("0172ec_5a99c749bd2a4206948991c3741661b3~mv2_d_2048_1536_s_2.jpg",
      "Inside the Midwest City store at 7010 SE 15th Street"),
     ("0172ec_7c1877925d9241b185132d3eef5d643c~mv2_d_3264_2448_s_4_2.jpg",
@@ -865,7 +885,15 @@ PHOTO_DIR = os.path.join(ASSETS_DIR, "photos")
 
 
 def photo_id(filename):
-    """Wix media name -> the stable hash we store the local copy under."""
+    """Photo reference -> the name its local copy is stored under.
+
+    A Wix media name (`0172ec_<hash>~mv2.jpg`) reduces to its hash, which is
+    what the originals were pulled down as. Photos we shot ourselves never
+    passed through Wix and carry a plain readable name instead, so anything
+    without the Wix prefix is used as-is.
+    """
+    if "~" not in filename and "_" not in filename:
+        return filename.rsplit(".", 1)[0]
     return filename.split("_", 1)[1].split("~")[0]
 
 
@@ -1551,11 +1579,53 @@ def build_pages(L):
             "than a builder-grade fan with brass trim and five bulbs, and nothing makes a room look ten years newer for "
             "less money. Do the whole house at closeout pricing and the difference shows in listing photos before it "
             "shows anywhere else &mdash; which is why flippers and landlords buy fans from us by the cartload.",
+            "Ceiling fans are the deepest single category in the building. We carry a full variety &mdash; Home "
+            "Decorators Collection, Hunter, Glacier Bay, Project Source, Kichler and many more &mdash; in indoor and "
+            "outdoor styles, with and without lights, from small-room sizes up to great-room spans. At times we have "
+            "a thousand fans in stock across the two stores.",
+            "Some of those fans are open-box, and some came back to a big-box store as returns. What is worth knowing "
+            "is <em>why</em> they came back. A large share of returned ceiling fans were never faulty: the handheld "
+            "remote was never paired to the receiver in the canopy, or the fan was wired as if it were on a single "
+            "switch when the room is actually on a three-way. Those are setup problems, not product problems &mdash; "
+            "and they send a perfectly good fan back to the returns desk in its original box. Most of the time it is "
+            "not the fan.",
+            "We have also moved to a velocity-first model: price it to move and keep the floor turning. On fans that "
+            "can mean opening the box and inspecting the unit with you right at checkout rather than holding stock "
+            "back for a bench test. You see what you are buying before it goes in the truck, and the line keeps "
+            "moving. Ask at the counter and we will go through it with you.",
             "We also stock ceiling fan parts, and we list one-off units and harder-to-find parts through our eBay "
             f"store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a>, which ships anywhere. If a fan "
             "is otherwise fine and you need a blade arm, a downrod, or a remote receiver, call before you replace the "
             "whole thing.",
         ],
+        extra=lambda L: '''
+<div class="card" style="margin:1.4rem 0">
+  <span class="eyebrow">Before you box it back up</span>
+  <h3>Six things to check on a ceiling fan that won&rsquo;t behave</h3>
+  <p>Most fans that get returned are working fans. Run through these first &mdash; it is usually one of them.</p>
+  <ol>
+    <li><b>Nothing works at all.</b> Check the breaker and the wall switch. A fan on a remote needs its wall
+      switch left <em>on</em> permanently &mdash; if someone flips it off, the receiver has no power and the
+      remote does nothing.</li>
+    <li><b>The remote does nothing.</b> New battery first, then re-pair it. On most fans: cut power at the
+      breaker for about 30 seconds, restore it, and within the next 30 seconds press and hold the pairing
+      button until the light blinks. Older fans instead use a bank of tiny DIP switches &mdash; the pattern in
+      the remote has to match the pattern on the receiver exactly.</li>
+    <li><b>The light works but the fan doesn&rsquo;t, or the reverse.</b> Usually a pull chain left in the off
+      position, or the receiver in the canopy. Check the chains before you blame the motor.</li>
+    <li><b>It hums or buzzes.</b> A fan motor must not run on a light dimmer. A standard dimmer on a fan
+      circuit causes hum and will shorten the motor&rsquo;s life. Swap it for a normal switch or a proper fan
+      control.</li>
+    <li><b>It only works from one of two switches.</b> That is a three-way circuit wired as though it were a
+      single switch. The fan needs constant hot; the travelers have to be picked up correctly or the fan is
+      dead from one location and fine from the other.</li>
+    <li><b>It wobbles.</b> Nearly always mounting or blade balance, not a bad motor. Confirm the box is
+      fan-rated, tighten the bracket to the box, then check every blade screw and use the balance kit that
+      came in the carton.</li>
+  </ol>
+  <p>Still stuck? Call the store &mdash; <a href="tel:+14052068111">405-206-8111</a> &mdash; and describe what
+    it is doing. We sell enough fans to have heard it before.</p>
+</div>''',
         faq=[
             ("Where can I buy discount ceiling fans and light fixtures in the OKC metro?",
              "Jameson's Discount Home Improvement — Midwest City and south OKC near I-240. Name-brand fixtures and "
@@ -1568,6 +1638,28 @@ def build_pages(L):
              "electrician."),
             ("Do you stock LED?",
              "Yes — LED fixtures and lighting regularly come through both stores."),
+            ("What ceiling fan brands do you carry?",
+             "A full variety — Home Decorators Collection, Hunter, Glacier Bay, Project Source, Kichler and many "
+             "more, in indoor and outdoor styles. At times we have a thousand ceiling fans in stock across the "
+             "Midwest City and south OKC stores."),
+            ("Are your ceiling fans new, open-box or returns?",
+             "A mix. Some are new closeout and overstock, some are open-box, and some came back to a big-box store "
+             "as returns. We tell you which at the counter, and we can open the box and inspect the unit with you "
+             "at checkout."),
+            ("My new ceiling fan's remote doesn't work — is the fan bad?",
+             "Usually not. Most often the remote was never paired to the receiver: cut power at the breaker for "
+             "about 30 seconds, restore it, then press and hold the remote's pairing button within the next 30 "
+             "seconds until the light blinks. Older fans use DIP switches instead, and the pattern in the remote "
+             "must match the receiver exactly. Also check that the wall switch is left on, since a fan on a remote "
+             "has no power to its receiver when the switch is off."),
+            ("Why do so many working ceiling fans get returned?",
+             "Two setup problems account for a large share of them: the handheld remote was never paired to the "
+             "receiver, and the fan was wired as though it were on a single switch when the room is on a three-way. "
+             "Neither is a fault in the fan. Most of the time it is not the product."),
+            ("Why does my ceiling fan hum?",
+             "Most often it is on a light dimmer. A ceiling fan motor should never run on a standard dimmer — it "
+             "causes the hum and shortens the motor's life. Replace it with a normal switch or a proper fan speed "
+             "control."),
         ]))
 
     cat.append(dict(
