@@ -1183,8 +1183,9 @@ def build_pages(L):
   <h2>Running-line product at closeout prices, ten years in the OKC metro</h2></div>
   <div class="split">
     <div class="card"><h3>Running-line, in the box</h3>
-      <p>Our flooring, paint and fixtures are name-brand, running-line product &mdash; not seconds, not returns.
-      We buy closeouts, overstock and end-of-line lots, so you get what the big stores sell for up to half the price.</p></div>
+      <p>Most of our flooring, paint and fixtures are name-brand, running-line product in the box. We buy closeouts,
+      overstock and end-of-line lots, so you get what the big stores sell for up to half the price. Where something is
+      scratch-and-dent, it is priced for it and we point it out &mdash; everything has a place and a price.</p></div>
     <div class="card"><h3>Truckloads, weekly</h3>
       <p>New lots land every week and sell fast. What's here today may be gone next Saturday &mdash; which is exactly
       why the prices are what they are.</p></div>
@@ -1253,7 +1254,7 @@ def build_pages(L):
         desc=("Name-brand bathroom vanities at closeout prices in Midwest City and South OKC &mdash; single and double "
               "vanities including Vanity Art and Wyndham Collection. Stock changes weekly; call or visit."),
         h1="Discount bathroom vanities in OKC &mdash; up to 50% off Vanity Art, Wyndham &amp; more",
-        lead="Single and double vanities, tops and mirrors from closeout and overstock lots &mdash; in the box, not seconds.",
+        lead="Single and double vanities, tops and mirrors from closeout and overstock lots.",
         paras=[
             "Jameson's Discount Home Improvement Warehouse carries name-brand bathroom vanities at closeout prices, "
             "including Vanity Art and Wyndham Collection pieces. Sizes run from compact single vanities for a half "
@@ -1305,6 +1306,18 @@ def build_pages(L):
             "a tapping block will carry most rooms. Large-format tile, wet areas, and subfloor repair are where a "
             "professional installer earns their fee. Either way, the flooring itself is where the savings live: "
             "material bought at closeout costs the same to install as material bought at full retail.",
+            "You can absolutely do this yourself. Click-lock luxury vinyl plank snaps together by hand, and you cut it "
+            "with a box knife &mdash; score the surface, snap the plank, no wet saw, no tile setter, no mortar. Most "
+            "rooms are a weekend. That is the whole reason LVP beats tile on a budget: the material is cheaper here, "
+            "and the labor is you.",
+            "The one spec worth understanding before you buy is the wear layer, and it is the number most people "
+            "ignore. It is the clear protective film on top, measured in mils, and it &mdash; not the price, not the "
+            "thickness of the plank, not how the photo looks &mdash; is what decides how long the floor survives. "
+            "A 12 mil wear layer is fine for a bedroom, a guest room, or anywhere that sees socks and light traffic. "
+            "A 20 mil wear layer is what you want in a kitchen, an entry, a hallway, a rental between tenants, or any "
+            "house with dogs and kids. Two planks can look identical on the floor and wear completely differently, so "
+            "when you compare a price here against a big-box price, compare the wear layer first &mdash; that is "
+            "usually where the difference actually is.",
             "Because our inventory comes from truckload closeouts, surplus lots arrive continuously and sell fast. If "
             "you're calculating square footage for a project, call ahead or stop by &mdash; staff can tell you what's "
             "on the floor and how much of it is left.",
@@ -1314,8 +1327,18 @@ def build_pages(L):
              "Yes — our waterproof rigid-core LVP averages $2.19–$2.69/sf depending on the current lot, with a "
              "manufacturer warranty. Stock changes weekly."),
             ("Can I install LVP myself?",
-             "Click-lock floating LVP is one of the most DIY-friendly floors made. If your subfloor is flat and dry, "
-             "most rooms are a weekend project. Tile and subfloor repair are better left to a pro."),
+             "Click-lock floating LVP is one of the most DIY-friendly floors made. The planks snap together by hand "
+             "and you cut them with a box knife — score and snap, no wet saw. If your subfloor is flat and dry, most "
+             "rooms are a weekend project. Tile and subfloor repair are better left to a pro."),
+            ("What wear layer do I need — is 12 mil or 20 mil better?",
+             "The wear layer is the clear film on top and it decides how long the floor lasts. 12 mil is fine for "
+             "bedrooms and light-traffic rooms. Choose 20 mil for kitchens, entries, hallways, rentals, and homes "
+             "with pets or kids. Compare wear layers before you compare prices — that is usually where the real "
+             "difference between two similar-looking floors is."),
+            ("Is LVP cheaper than tile?",
+             "Almost always, once labor is counted. The material costs less at closeout pricing, and click-lock LVP "
+             "is a DIY install with a box knife, while tile needs a setter, mortar, grout and waterproofing. The "
+             "savings on installation are usually larger than the savings on the material."),
             ("How much should I buy?",
              "Measure your square footage and add roughly 10% for cuts and waste. Staff at either store can help you "
              "check the math against what's in stock."),
@@ -1330,11 +1353,18 @@ def build_pages(L):
         desc=("Name-brand toilets, tubs and faucets at closeout prices in Midwest City &amp; South OKC. Inventory "
               "changes weekly &mdash; call or visit to see what's in stock."),
         h1="Discount bath &mdash; toilets, tubs &amp; faucets in OKC up to 50% off",
-        lead="Name-brand bath fixtures from closeout and overstock lots &mdash; not seconds, not returns.",
+        lead="Name-brand bath fixtures from closeout and overstock lots, plus a scratch-and-dent line priced for it.",
         paras=[
             "Jameson's carries name-brand toilets, bathtubs, faucets, and bath fixtures at up to 50% off big-box "
-            "retail &mdash; brands like Kohler and Moen from closeout and overstock lots, not seconds or returns. The "
+            "retail &mdash; brands like Kohler and Moen. Most of it is closeout, overstock and end-of-line product in "
+            "the box. Some of it is scratch-and-dent, priced accordingly and pointed out to you before you buy. The "
             "exact models rotate week to week, but toilets, tubs, and faucets are core stock at both stores year-round.",
+            "The scratch-and-dent Vanity Art bathtubs are worth a specific look if you are flipping a house or "
+            "remodeling to a budget. A tub with a chip or a scuff in the acrylic is a fraction of the price of a "
+            "perfect one, and acrylic repair epoxy is a twenty-minute job with a kit from the shelf &mdash; sand, fill, "
+            "cure, polish. Once it is installed and the surround is on, nobody can tell, and the money you didn't "
+            "spend on the tub covers the fixtures. Ask which units have damage and where it is; on a tub destined for "
+            "an alcove, a mark on an apron that ends up against a wall costs you nothing at all.",
             "A bathroom refresh is one of the best returns on a remodel dollar, and much of it is DIY territory: "
             "swapping a faucet or installing a new toilet takes basic tools and an afternoon. Replacing a bathtub or "
             "moving supply lines is where a licensed plumber is the right call. The math works the same either way "
@@ -1351,7 +1381,10 @@ def build_pages(L):
              "Jameson's Discount Home Improvement — 7010 SE 15th Street in Midwest City and 8100 S. Santa Fe Ave in "
              "south OKC near I-240. Name-brand bath fixtures at up to 50% off retail."),
             ("Are these seconds or damaged units?",
-             "No — closeout, overstock, and liquidation inventory. Name-brand, running-line product in the box."),
+             "It is a mix, and we tell you which is which. Most of the floor is closeout, overstock and end-of-line "
+             "inventory — name-brand, running-line product in the box. We also carry a scratch-and-dent line, "
+             "including Vanity Art bathtubs, priced for the condition. Everything has a price; ask and staff will show "
+             "you exactly where the damage is before you buy."),
             ("Can I replace a faucet or toilet myself?",
              "Both are common DIY jobs with basic tools. Tub replacement or plumbing relocation is worth hiring a "
              "licensed plumber."),
@@ -1579,9 +1612,6 @@ def build_pages(L):
             "lighting update, they take every ceiling fan from us and buy the one odd-size flush mount elsewhere. "
             "Getting eighty percent of a project at closeout pricing is the win &mdash; nobody needs us to be the only "
             "stop, and we will tell you straight when we don't have the depth for your list.",
-            "Holiday decor is a real department here, not an afterthought. Trees, lighting and seasonal decor move in "
-            "volume every year at a fraction of seasonal retail, and it lands early &mdash; if you are decorating a "
-            "storefront, an office or a big front yard, come before the picked-over weeks.",
             "A few one-off units and harder-to-find parts, including ceiling fan parts, are listed online through our "
             "eBay store under the Jameson's name. The floor is still where the volume is, but if you need a single "
             "obscure part, that is often the fastest way to get it.",
@@ -1620,6 +1650,16 @@ def build_pages(L):
             "Closeout pricing isn't a sale that ends Sunday &mdash; it's how the whole store is bought. Below are the "
             "standing prices worth planning around. Everything else is whatever came off the truck this week, which "
             "is why it pays to stop in regularly or follow us on Facebook and Instagram.",
+            "Seasonal and holiday decor runs alongside all of it &mdash; trees, lighting and decor at a fraction of "
+            "seasonal retail, and it lands early rather than late. If you are decorating a storefront, an office or a "
+            "big front yard, come before the picked-over weeks.",
+            "The other standing deal is the scratch-and-dent line. A Vanity Art bathtub with a chip or a scuff costs a "
+            "fraction of a perfect one, and acrylic repair epoxy is a twenty-minute job &mdash; sand, fill, cure, "
+            "polish. On a flip or a rental turn, that is the single easiest place to take real money out of the "
+            "budget. Ask staff to show you where the damage is; on a tub going into an alcove, a mark that ends up "
+            "against a wall costs you nothing.",
+            "And a 60-inch double vanity with an engineered stone top is $629 right now &mdash; a modular unit you can "
+            "extend to 72 or 84 inches for less than a custom cabinet shop charges for the base alone.",
         ],
         extra=lambda L: f'''
 <div class="split" style="margin:1.3rem 0">
@@ -1657,8 +1697,10 @@ def build_pages(L):
         paras=[
             "Jameson's Discount Home Improvement Warehouse buys closeout, overstock and end-of-line inventory by the "
             "truckload from manufacturers and distributors, and sells it out of two Oklahoma City metro stores at up "
-            "to half of what the same product costs at retail. The product is name-brand, running-line and in the box "
-            "&mdash; the discount comes from how we buy, not from what it is.",
+            "to half of what the same product costs at retail. Most of it is name-brand, running-line product in the "
+            "box, where the discount comes purely from how we buy. Some of it is scratch-and-dent, priced for the "
+            "condition and disclosed before you buy. We don't pretend it's all one thing: everything has a place and "
+            "a price, and our job is to find the right price for it.",
             "That's also why the floor changes constantly. There's no catalog and no back stock: when a lot is gone, "
             "it's gone, and something else is in its place. Customers who check in regularly do the best.",
             "Ten years in, we're a leader in the circular economy in this market, and we mean that literally rather "
