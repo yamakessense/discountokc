@@ -1622,10 +1622,10 @@ def build_pages(L):
             "lighting update, they take every ceiling fan from us and buy the one odd-size flush mount elsewhere. "
             "Getting eighty percent of a project at closeout pricing is the win &mdash; nobody needs us to be the only "
             "stop, and we will tell you straight when we don't have the depth for your list.",
-            "What we don't carry is worth saying plainly, because it saves you a trip. Windows are the main one: they "
-            "are a specialty custom item, sized and ordered to the opening, and that is not a business you can run off "
-            "closeout truckloads. We don't stock them and we won't pretend otherwise &mdash; but ask at the counter and "
-            "staff will point you to a few local companies we have seen do right by customers.",
+            "What we don't carry is worth saying plainly, because it saves you a trip. Windows and screen doors are "
+            "the main ones. Both are specialty custom items, sized and ordered to the opening, and that is not a "
+            "business you can run off closeout truckloads. We don't stock them and we won't pretend otherwise "
+            "&mdash; but ask at the counter and staff will point you to a few local companies instead.",
             "A few one-off units and harder-to-find parts, including ceiling fan parts, are listed online through our "
             f"eBay store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a> &mdash; 100% positive "
             "feedback across hundreds of sales, and we ship those anywhere. The floor is still where the volume is, "
@@ -1649,7 +1649,11 @@ def build_pages(L):
              "Call the store and ask — it depends on the item and how much of the lot is left."),
             ("Do you sell windows?",
              "No. Windows are a specialty custom item, sized and ordered to the opening, so they aren't something we "
-             "buy as closeout lots. Ask at either store and staff will point you to a few local companies instead."),
+             "buy as closeout lots. We don't carry screen doors either. Ask at either store and staff will point you "
+             "to a few local companies instead."),
+            ("Do you carry screen doors?",
+             "No — screen doors and windows are both custom, made-to-opening items, so they fall outside what we buy "
+             "as closeout inventory. Staff at either store can recommend a local company."),
             ("Do you buy or take trade-ins?",
              "We buy closeout, overstock and end-of-line lots from manufacturers and distributors. Call the Midwest "
              "City store at 405-206-8111 if you have a lot to move."),
