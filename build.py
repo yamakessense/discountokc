@@ -1985,9 +1985,27 @@ def build_pages(L):
             "given someone directions using him without knowing his name. He is the reason people say &ldquo;the "
             "place with the dinosaur&rdquo; instead of the address, and we are entirely fine with that &mdash; a "
             "family business that has been here ten years should be easy to find and hard to forget.",
-            "We buy as well as sell, and we source locally where we can. If you're a manufacturer, distributor, "
-            "builder or contractor sitting on a cancelled order, a discontinued line, a closeout lot or a warehouse "
-            "you need cleared, we'll look at it. Reach the sales department at "
+            "The other half of that is the people who buy it. Most of what leaves here goes to somebody doing the "
+            "work themselves &mdash; a landlord turning a rental over a weekend, a couple redoing a bathroom, a "
+            "contractor filling out the back half of a job. DIY resourcefulness is most of what walks through the "
+            "door, and closeout pricing is what puts a project inside a real budget. We would rather sell you the fan "
+            "and show you how to pair the remote than have you pay somebody for the call.",
+            "We source locally wherever we can. Oklahoma manufacturers, regional distributors and businesses right "
+            "here in the metro sitting on product they need gone beat a load trucked in from three states away "
+            "&mdash; on freight, on turnaround, and for the people we are buying from.",
+            "We buy as well as sell. Most of our inventory we buy outright and up front, which is usually what a "
+            "seller wants: one price, one pickup, done. Sometimes we take inventory on consignment instead and let "
+            "the market set the price. That is common practice with specialty equipment, surplus construction "
+            "material and job-site leftovers, where nobody really knows what a thing is worth until it sits on a "
+            "floor in front of buyers.",
+            "Got something to sell? We are the local infrastructure a lot of big-box stores, manufacturers and "
+            "distribution centers are looking for. Routing goods back up the supply chain is slow and expensive, and "
+            "product sits while it waits its turn. We clear that bottleneck. We take return-to-vendor and reverse "
+            "logistics center goods all the time, and local businesses fill a trailer with scratch-and-dent, bender "
+            "buybacks and the rest and call us to get it moving. That keeps the river of goods flowing instead of "
+            "parked in somebody's warehouse.",
+            "Manufacturer, distributor, builder, contractor, or a store with a back room that needs clearing &mdash; "
+            "we will look at it. Reach the sales department at "
             "<a href=\"mailto:b2b@discountokc.com\">b2b@discountokc.com</a>.",
             "The mulch side of the business scales all the way up. 405RubberMulch.com is our regional wholesale arm, "
             "delivering flatbed truckloads of IPEMA-certified playground rubber mulch to schools, cities and "
@@ -2006,6 +2024,23 @@ def build_pages(L):
             ("Are you related to 405RubberMulch.com?",
              "Yes — 405RubberMulch.com is our regional wholesale arm for rubber mulch, serving Oklahoma, Kansas, "
              "Missouri and Arkansas."),
+            ("Does Jameson's buy inventory?",
+             "Yes. We buy closeout, overstock, cancelled orders, discontinued lines and end-of-line lots from "
+             "manufacturers, distributors, builders and contractors, and we source locally wherever we can. Send "
+             "details to b2b@discountokc.com."),
+            ("Do you buy outright or take inventory on consignment?",
+             "Most of it we buy outright and up front — one price, one pickup. Sometimes we take inventory on "
+             "consignment instead and let the market set the price, which is common practice with specialty "
+             "equipment, surplus construction material and job-site leftovers, where the value isn't clear until "
+             "it's in front of buyers."),
+            ("Do you accept return-to-vendor or reverse logistics goods?",
+             "All the time. Routing goods back up the supply chain is slow and expensive, and product sits while it "
+             "waits its turn. We take RTV and reverse logistics center loads, and local businesses fill a trailer "
+             "with scratch-and-dent, bender buybacks and the rest and call us to get it moving."),
+            ("How is a closeout store part of the circular economy?",
+             "Everything we buy was already manufactured and would otherwise have been written off, remaindered or "
+             "landfilled — cancelled builder orders, discontinued lines, overstock a distributor needs off the "
+             "floor. Selling it at half retail keeps it in service in Oklahoma homes instead of in a waste stream."),
         ]))
 
     cat.append(dict(
@@ -2057,6 +2092,12 @@ def build_pages(L):
             "405RubberMulch.com.",
             "Finished a project with something you bought here? Send us photos at "
             "<a href=\"mailto:save@discountokc.com\">save@discountokc.com</a>. We like seeing where it ended up.",
+            "Got something to sell? We buy closeout, overstock, cancelled orders, discontinued lines and "
+            "end-of-line lots, mostly outright and up front &mdash; one price, one pickup. On specialty equipment, "
+            "surplus construction material and job-site leftovers we will also take inventory on consignment and let "
+            "the market set the price. We take return-to-vendor and reverse logistics center goods all the time, and "
+            "local businesses fill a trailer with scratch-and-dent, bender buybacks and the rest and call us to get "
+            "it moving. Send details to <a href=\"mailto:b2b@discountokc.com\">b2b@discountokc.com</a>.",
         ],
         extra=lambda L: '''
 <div class="split" style="margin:1.3rem 0">
@@ -2069,8 +2110,9 @@ def build_pages(L):
   <div class="card"><span class="eyebrow">Email &amp; wholesale</span><h3>save@discountokc.com</h3>
   <p>General questions by email. Truckload rubber mulch quotes: <a href="https://405rubbermulch.com">405RubberMulch.com</a>.</p></div>
   <div class="card"><span class="eyebrow">Sell to us &middot; B2B</span><h3>b2b@discountokc.com</h3>
-  <p>We buy closeout, overstock, cancelled orders and discontinued lines, and we source locally. Manufacturers,
-  distributors, builders and contractors with a lot to move &mdash; send it here.</p></div>
+  <p>Closeout, overstock, cancelled orders, discontinued lines, RTV and reverse logistics loads. Bought outright
+  up front, or taken on consignment where the market should set the price. Manufacturers, distributors, builders
+  and contractors with a trailer to move &mdash; send it here.</p></div>
 </div>''',
         faq=[
             ("What's the best way to reach Jameson's?",
@@ -2080,6 +2122,13 @@ def build_pages(L):
              "Sales are in-store, but staff will happily check whether something is on the floor before you drive out."),
             ("Who do I contact about truckload rubber mulch?",
              "405RubberMulch.com, our regional wholesale arm serving Oklahoma, Kansas, Missouri and Arkansas."),
+            ("I have inventory to sell — who do I talk to?",
+             "b2b@discountokc.com. We buy closeout, overstock, cancelled orders, discontinued lines, return-to-vendor "
+             "and reverse logistics loads — mostly outright and up front, sometimes on consignment. Send what you "
+             "have, roughly how much of it, and where it sits."),
+            ("Will you clear out a warehouse or a back room?",
+             "Yes, that's a routine job for us. Local businesses fill a trailer with scratch-and-dent, bender "
+             "buybacks and the rest and call us to get it moving. Email b2b@discountokc.com with what's there."),
         ]))
 
     P.extend(cat)

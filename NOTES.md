@@ -165,6 +165,26 @@ both has to say so, and both category FAQs carry the question outright, because
 "can I combine these" is exactly the kind of thing a customer asks at the
 counter after reading only one of them.
 
+## Buying inventory — the B2B side
+
+Half the business is buying, and the site says so on `about` and `contact`.
+The facts, so nobody softens them into vagueness later:
+
+- **Most inventory is bought outright and up front** — one price, one pickup.
+  That is what a seller usually wants and it should stay the headline.
+- **Consignment is the exception, not the pitch.** On specialty equipment,
+  surplus construction material and job-site leftovers we will take goods on
+  consignment and let the market set the price, because the value isn't clear
+  until it's in front of buyers.
+- **RTV and reverse logistics loads are routine.** Routing goods back up the
+  supply chain is slow and expensive and product sits waiting its turn. We are
+  the local infrastructure that clears the bottleneck. Big-box stores,
+  manufacturers and distribution centers are the audience for that sentence.
+- **Trailer clear-outs** — scratch-and-dent, bender buybacks and the rest.
+  `bender buybacks` is trade vernacular and stays as the owner says it.
+
+Everything routes to `b2b@discountokc.com`. Keep that address on both pages.
+
 ## Condition language
 
 The site used to claim inventory was "not seconds, not returns." It isn't — the
