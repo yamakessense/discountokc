@@ -779,6 +779,34 @@ TRUST = [
 ]
 
 
+# ===================== CAMPAIGN PAGES =====================
+# Drop a page in here and it builds, with its own Google tag, without touching
+# anything else. Nothing else in build.py needs editing.
+#
+#   CAMPAIGN_PAGES = [
+#     dict(
+#       slug="fall-flooring-sale",
+#       title="Fall Flooring Sale | Waterproof LVP from $2.19/sf | Jameson's",
+#       desc="One or two lines for the search result and the link preview.",
+#       h1="Waterproof LVP from $2.19 a square foot",
+#       lead="One line under the headline.",
+#       paras=["Body paragraph.", "Another."],
+#       sections=[("The question somebody types?",
+#                  "The answer in the first 40-60 words.",
+#                  ["Supporting detail."])],
+#       faq=[("A question?", "An answer.")],
+#       gtag=dict(ids=["AW-1234567890"], send_to="AW-1234567890/AbC_dEfGhIjK"),
+#       noindex=False,     # True for a paid lander you don't want in search
+#       nav="",            # leave empty: campaign pages stay out of the nav
+#     ),
+#   ]
+#
+# The page gets the same masthead, category nav, footer, store schema and
+# mobile treatment as everything else. It lands in the sitemap unless
+# noindex=True. See NOTES.md for the gtag field and Product offers.
+CAMPAIGN_PAGES = []
+
+
 # Photos stay in the Wix Media Manager and load from Wix's CDN.
 # Add or swap a page's photos by editing this map — nothing to upload.
 PHOTOS = {
@@ -1287,6 +1315,39 @@ def faq_html(items):
     return "".join(out)
 
 
+def gtag_block(g):
+    """Google tag for one page only. No page carries it unless it asks for it.
+
+    The site runs no analytics by default, which is deliberate: nothing to
+    consent to and nothing blocking the first paint. A campaign page opts in
+    with a `gtag` field taking either a list of IDs or a dict:
+
+        gtag=["G-XXXXXXXXXX", "AW-1234567890"]
+        gtag=dict(ids=["AW-1234567890"],
+                  send_to="AW-1234567890/AbC_dEfGhIjK")   # also fires a conversion
+
+    IDs are written straight into the page source, so put only real measurement
+    IDs here. This repo is public — never an API key or anything secret.
+    """
+    if not g:
+        return ""
+    if isinstance(g, (list, tuple, str)):
+        g = {"ids": [g] if isinstance(g, str) else list(g)}
+    ids = [i for i in (g.get("ids") or []) if i]
+    if not ids:
+        return ""
+    configs = "\n  ".join(f"gtag('config', '{i}');" for i in ids)
+    fire = ""
+    if g.get("send_to"):
+        fire = (f"\n  gtag('event', '{g.get('event', 'conversion')}', "
+                f"{{'send_to': '{g['send_to']}'}});")
+    return (f'\n<script async src="https://www.googletagmanager.com/gtag/js?id={ids[0]}"></script>'
+            "\n<script>\n  window.dataLayer = window.dataLayer || [];"
+            "\n  function gtag(){dataLayer.push(arguments);}"
+            "\n  gtag('js', new Date());"
+            f"\n  {configs}{fire}\n</script>")
+
+
 def anchor(text):
     """Stable #id from a question heading, so one answer can be linked and cited."""
     s = re.sub(r"<[^>]+>", "", strip(text)).lower()
@@ -1308,6 +1369,46 @@ def sections_html(sections):
         out.append(f'<div class="qa" id="{anchor(q)}"><h2>{q}</h2>'
                    f'<p class="bluf">{bluf}</p>{body}</div>')
     return "".join(out)
+
+
+def product_nodes(p, url):
+    """Product snippets for items with a standing, visible price.
+
+    Google splits product structured data in two. *Merchant listings* are for
+    pages a customer can buy from directly; *product snippets* are for pages
+    they can't. Jameson's sells in store, so product snippets are the correct
+    class here and merchant listings are not.
+
+    Two rules decide what may go in a page's `products`:
+
+    1. **The price must be visible on that same page**, because structured data
+       has to match what the customer is shown. Every price marked up below is
+       in a .chip at the top of its own page.
+    2. **The price must be standing, not a rotating lot.** A closeout vanity
+       that sells on Saturday would leave stale markup behind. Only stock the
+       store always carries at a known price belongs here.
+
+    That rules out most of the floor, and it should — this store has no catalog
+    and stock turns weekly. Paint, rubber mulch and LVP are the exceptions.
+    """
+    out = []
+    for i, d in enumerate(p.get("products") or []):
+        node = {"@type": "Product", "@id": f"{url}#product-{i + 1}",
+                "name": strip(d["name"]), "description": strip(d["desc"]),
+                "category": d.get("category", "Home Improvement")}
+        if d.get("brand"):
+            node["brand"] = {"@type": "Brand", "name": strip(d["brand"])}
+        if d.get("photo"):
+            node["image"] = f"{SITE}/assets/photos/{photo_id(d['photo'])}.webp"
+        common = {"priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock",
+                  "itemCondition": "https://schema.org/NewCondition",
+                  "url": url, "seller": {"@id": SITE + "/#midwest-city"}}
+        node["offers"] = ({"@type": "AggregateOffer", "lowPrice": d["low"],
+                           "highPrice": d["high"], **common} if d.get("low")
+                          else {"@type": "Offer", "price": d["price"], **common})
+        out.append(node)
+    return out
 
 
 def howto_nodes(p, url):
@@ -1559,6 +1660,12 @@ def build_pages(L):
         h1="Discount flooring in OKC &mdash; waterproof LVP &amp; tile up to 50% off",
         lead="Rigid-core waterproof plank and porcelain tile, bought by the truckload and priced to move.",
         chips=[("$2.19&ndash;$2.69", "per sq ft, waterproof LVP"), ("12&ndash;20 mil", "wear layer, warrantied")],
+        products=[dict(
+            name="Waterproof rigid-core luxury vinyl plank flooring",
+            desc=("Rigid-core waterproof LVP with a 12 to 20 mil wear layer and manufacturer warranty, sold by "
+                  "the square foot at Jameson's Discount Home Improvement Warehouse in the Oklahoma City metro."),
+            low="2.19", high="2.69", category="Flooring",
+            photo="0172ec_e2e8bcf26b224e18ab6e5f771118fce2~mv2.jpeg")],
         paras=[
             "Jameson's Discount Home Improvement carries waterproof luxury vinyl plank (LVP) and porcelain tile at "
             "closeout prices &mdash; the same rigid-core, name-brand product big-box stores sell, at a fraction of the "
@@ -1982,6 +2089,20 @@ def build_pages(L):
         h1="Playground certified bulk rubber mulch in stock &mdash; OKC",
         lead="IPEMA-certified chunk rubber nuggets, bagged or by the supersack, for pickup at either store.",
         chips=[("$8", "24-lb bag"), ("$601", "2,000-lb supersack"), ("$500", "summer special, pickup only")],
+        # The $500 supersack price is a summer special and will lapse, so the
+        # supersack is marked up at its standing $601. Stale markup on an expired
+        # price is worse than no markup.
+        products=[
+            dict(name="IPEMA-certified playground rubber mulch, 24-pound bag",
+                 desc=("IPEMA-certified chunk rubber nugget playground mulch in a 24-pound bag, in stock at both "
+                       "Jameson's Discount Home Improvement Warehouse stores in the Oklahoma City metro."),
+                 price="8.00", category="Landscaping Mulch",
+                 photo="0172ec_aa97ca263ee648dfaa70da5ecabd2b50~mv2.jpg"),
+            dict(name="Bulk rubber mulch supersack, 2,000 pounds",
+                 desc=("IPEMA-certified chunk rubber mulch in a 2,000-pound supersack, pickup only from Jameson's "
+                       "in Midwest City or south Oklahoma City."),
+                 price="601.00", category="Landscaping Mulch",
+                 photo="0172ec_9111a136d9c641c0a1ffec33d89cc110~mv2.jpg")],
         paras=[
             "Jameson's stocks IPEMA-certified chunk rubber nuggets for playgrounds, landscape beds and play areas at "
             "both OKC-metro stores. Buy it by the 24-lb bag at $8, or by the 2,000-lb supersack at $601. All summer "
@@ -2108,6 +2229,12 @@ def build_pages(L):
               "a gallon, waterproof LVP from $2.19/sf. Two OKC-metro stores."),
         h1="Deals on the floor right now",
         lead="Standing prices that beat retail, plus whatever landed this week.",
+        products=[dict(
+            name="Visions Quality Coatings Workhorse interior and exterior latex paint",
+            desc=("Workhorse interior and exterior latex paint in 1-gallon and 5-gallon buckets, $21.99 a gallon "
+                  "every day at Jameson's Discount Home Improvement Warehouse in the Oklahoma City metro. "
+                  "Remanufactured premium paint with national-brand performance."),
+            price="21.99", brand="Visions Quality Coatings", category="Paint")],
         chips=[("$500", "supersack, summer special"), ("$21.99", "Visions paint, per gallon"),
                ("$2.19+", "waterproof LVP, per sq ft")],
         paras=[
@@ -2345,6 +2472,13 @@ def build_pages(L):
         ]))
 
     P.extend(cat)
+    # Campaign pages last: they are additions, never overrides, and a typo in
+    # one must not be able to shadow a real category page.
+    taken = {p["slug"] for p in P}
+    for c in CAMPAIGN_PAGES:
+        if c["slug"] in taken:
+            raise SystemExit(f"campaign page slug '{c['slug']}' collides with an existing page")
+        P.append({"nav": "", "lead": "", "paras": [], "faq": [], **c})
     return P
 
 # ===================== BUILD =====================
@@ -2481,7 +2615,7 @@ def page_schema(p):
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
                 {"@type": "ListItem", "position": 2, "name": strip(p["h1"]), "item": url}]},
             faq_node(url, p["faq"], p.get("sections") or ()),
-        ] + howto_nodes(p, url) + video_nodes(p["slug"], url)
+        ] + product_nodes(p, url) + howto_nodes(p, url) + video_nodes(p["slug"], url)
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1)
 
 
@@ -2536,7 +2670,7 @@ def full_page(p, body, L):
 <title>{p['title']}</title>
 <meta name="description" content="{strip(p['desc'])}">
 <link rel="canonical" href="{url}">
-<meta name="robots" content="index,follow">
+<meta name="robots" content="{'noindex,follow' if p.get('noindex') else 'index,follow'}">{gtag_block(p.get('gtag'))}
 <meta property="og:type" content="{'website' if p['slug']=='' else 'article'}">
 <meta property="og:title" content="{strip(p['title'])}">
 <meta property="og:description" content="{strip(p['desc'])}">
@@ -2605,7 +2739,10 @@ def build_deploy():
         os.makedirs(d, exist_ok=True)
         with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
             f.write(full_page(p, body, dep_link))
-        urls.append(SITE + "/" + (p["slug"] + "/" if p["slug"] else ""))
+        # A noindex page is still built and still reachable by its URL — it just
+        # stays out of the sitemap, so nothing invites Google to a paid lander.
+        if not p.get("noindex"):
+            urls.append(SITE + "/" + (p["slug"] + "/" if p["slug"] else ""))
 
     # 404
     nf = dict(slug="404", nav="", title="Page not found | " + BIZ, desc="Page not found.",

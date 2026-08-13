@@ -237,6 +237,61 @@ The facts, so nobody softens them into vagueness later:
 
 Everything routes to `b2b@discountokc.com`. Keep that address on both pages.
 
+## Campaign pages and per-page Google tags
+
+Drop a dict into `CAMPAIGN_PAGES` near the top of `build.py` and the page
+builds — masthead, category nav, footer, store schema and the mobile treatment
+all come with it. Nothing else needs editing. A slug that collides with an
+existing page fails the build rather than shadowing it.
+
+```python
+CAMPAIGN_PAGES = [dict(
+  slug="fall-flooring-sale", title="…", desc="…", h1="…",
+  paras=["…"], sections=[(q, bluf, [detail])], faq=[(q, a)],
+  gtag=dict(ids=["AW-1234567890"], send_to="AW-1234567890/AbC_dEfGhIjK"),
+  noindex=True,     # paid lander: built and reachable, kept out of the sitemap
+)]
+```
+
+`gtag` also accepts a bare list — `gtag=["G-XXXXXXXXXX", "AW-1234567890"]` — for
+measurement with no conversion event. The tag is emitted **only** on pages that
+ask for it. The site carries no analytics by default and that is on purpose:
+nothing to consent to, nothing blocking first paint.
+
+The IDs are written into public page source, so only ever put real measurement
+IDs in that field. This repo is public.
+
+## Product snippets — what qualifies and what must not
+
+Google splits product structured data in two. *Merchant listings* are for pages
+a customer can buy from directly; *product snippets* are for pages they cannot.
+Jameson's sells in store, so **product snippets are the correct class and
+merchant listings are not** — do not add `priceValidUntil`, shipping or return
+policy nodes trying to qualify for the merchant experience.
+
+Two rules gate anything added to a page's `products`:
+
+1. **The price must be visible on that same page.** Structured data has to match
+   what the customer is shown. Every price below sits in a `.chip` at the top of
+   its own page.
+2. **The price must be standing, not a rotating lot.** A closeout vanity that
+   sells on Saturday leaves stale markup behind.
+
+That excludes most of the floor, correctly — there is no catalog and stock turns
+weekly. Currently marked up:
+
+| Page | Product | Offer |
+|---|---|---|
+| flooring | Waterproof rigid-core LVP | AggregateOffer $2.19–$2.69 |
+| rubbermulchokc | Playground rubber mulch, 24-lb bag | $8.00 |
+| rubbermulchokc | Bulk rubber mulch supersack, 2,000 lb | $601.00 |
+| deals | Visions Workhorse latex paint, per gallon | $21.99 |
+
+**The supersack is marked at its standing $601, not the $500 summer special.**
+The special will lapse and stale markup on an expired price is worse than no
+markup. Same reasoning for the $629 vanity on the deals page — a one-off
+closeout, so no Product node.
+
 ## Never strip the head
 
 Do not remove Google verification tags, tracking scripts, or meta tags when
