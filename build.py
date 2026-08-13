@@ -1701,6 +1701,11 @@ def build_pages(L):
             "Both stores are open Tuesday through Saturday from 9:00 AM to 6:00 PM and Sunday from 10:00 AM to 6:00 "
             "PM, and both are closed on Monday. Sales are in-store, and because inventory is closeout-driven, calling "
             "the specific store before you drive out is the fastest way to know what's actually on the floor.",
+            "These are real brick-and-mortar warehouses, not a pop-up or a drop-ship storefront with a mailing "
+            "address. Two buildings, ten years in the Oklahoma City metro, staff who walk the floor and count what's "
+            "actually there when you call. You can put your hands on the vanity, open the cabinet door, and look at "
+            "the finish under the lights before you spend a dollar &mdash; which is exactly why closeout buying works "
+            "in person and doesn't online.",
         ],
         faq=[
             ("What are Jameson's hours?",
