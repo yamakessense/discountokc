@@ -1902,7 +1902,9 @@ def store_nodes():
             "address": {"@type": "PostalAddress", "streetAddress": s["street"], "addressLocality": s["city"],
                         "addressRegion": "OK", "postalCode": s["zipc"], "addressCountry": "US"},
             "openingHoursSpecification": HOURS, "areaServed": s["area"], "email": "save@discountokc.com",
-            "logo": SITE + "/assets/logo.webp", "image": SITE + "/assets/og-card.png",
+            # PNG rather than the WebP badge: Bing and several structured-data
+            # consumers are unreliable with WebP logos.
+            "logo": SITE + "/assets/icon-192.png", "image": SITE + "/assets/og-card.png",
             "geo": {"@type": "GeoCoordinates", "latitude": s["lat"], "longitude": s["lng"]},
             "hasMap": "https://www.google.com/maps/search/?api=1&query=" + s["maps_q"],
             "currenciesAccepted": "USD",
@@ -2068,6 +2070,16 @@ def build_deploy():
         src = os.path.join(ASSETS_DIR, name)
         if os.path.isfile(src):
             shutil.copyfile(src, os.path.join(SITEDIR, "assets", name))
+
+    # Bing's crawler, and plenty of feed readers and link unfurlers, request
+    # /favicon.ico straight off the site root and never read the <link> tags.
+    # Ship a copy at the top of the published tree so that request resolves.
+    # After DNS cutover this IS the domain root; on the project-page test URL
+    # it is the root of everything we control.
+    for name in ("favicon.ico", "apple-touch-icon.png"):
+        src = os.path.join(ASSETS_DIR, name)
+        if os.path.isfile(src):
+            shutil.copyfile(src, os.path.join(SITEDIR, name))
     pages = build_pages(dep_link)
     urls = []
     for p in pages:
@@ -2090,7 +2102,10 @@ def build_deploy():
     with open(os.path.join(SITEDIR, "404.html"), "w", encoding="utf-8") as f:
         f.write(f'''<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{nf['title']}</title>
-<meta name="robots" content="noindex">{FONTS}<link rel="stylesheet" href="{BASE}/assets/site.css"></head><body>
+<meta name="robots" content="noindex">{FONTS}<link rel="stylesheet" href="{BASE}/assets/site.css">
+<link rel="icon" href="{BASE}/assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{BASE}/assets/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="{BASE}/assets/apple-touch-icon.png"></head><body>
 {topbar(dep_link)}{masthead(dep_link)}{catnav(dep_link,'')}<main>{body404}</main>{footer(dep_link)}</body></html>''')
 
     with open(os.path.join(SITEDIR, "sitemap.xml"), "w", encoding="utf-8") as f:
