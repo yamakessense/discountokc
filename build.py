@@ -796,6 +796,8 @@ TRUST = [
 #                  ["Supporting detail."])],
 #       faq=[("A question?", "An answer.")],
 #       gtag=dict(ids=["AW-1234567890"], send_to="AW-1234567890/AbC_dEfGhIjK"),
+#       pixel=dict(id="1234567890123456", event="Lead"),   # Meta, only while
+#                          # Meta ads are running — see NOTES.md
 #       noindex=False,     # True for a paid lander you don't want in search
 #       nav="",            # leave empty: campaign pages stay out of the nav
 #     ),
@@ -1346,6 +1348,42 @@ def gtag_block(g):
             "\n  function gtag(){dataLayer.push(arguments);}"
             "\n  gtag('js', new Date());"
             f"\n  {configs}{fire}\n</script>")
+
+
+def pixel_block(px):
+    """Meta pixel for one page only, same opt-in shape as gtag.
+
+    GA4 and the Meta pixel are not alternatives to each other. GA4 measures
+    traffic and attributes the source of it, across every channel, and it is the
+    right tool for "where did visitors come from". It cannot feed Meta's ad
+    auction. The pixel exists to send conversion signal back to Meta so delivery
+    optimises and a retargeting audience can be built. Run the pixel only while
+    Meta ads are actually running; there is nothing to optimise otherwise.
+
+        pixel="1234567890123456"
+        pixel=dict(id="1234567890123456", event="Lead")   # default is PageView
+
+    <noscript> fallback included, per Meta's own install snippet.
+    """
+    if not px:
+        return ""
+    if isinstance(px, str):
+        px = {"id": px}
+    pid = px.get("id")
+    if not pid:
+        return ""
+    ev = px.get("event")
+    extra = f"\n  fbq('track', '{ev}');" if ev and ev != "PageView" else ""
+    return (
+        "\n<script>\n"
+        "  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?\n"
+        "  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;\n"
+        "  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;\n"
+        "  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,\n"
+        "  document,'script','https://connect.facebook.net/en_US/fbevents.js');\n"
+        f"  fbq('init', '{pid}');\n  fbq('track', 'PageView');{extra}\n</script>\n"
+        f'<noscript><img height="1" width="1" style="display:none" alt=""\n'
+        f'  src="https://www.facebook.com/tr?id={pid}&ev=PageView&noscript=1"></noscript>')
 
 
 def anchor(text):
@@ -2670,7 +2708,7 @@ def full_page(p, body, L):
 <title>{p['title']}</title>
 <meta name="description" content="{strip(p['desc'])}">
 <link rel="canonical" href="{url}">
-<meta name="robots" content="{'noindex,follow' if p.get('noindex') else 'index,follow'}">{gtag_block(p.get('gtag'))}
+<meta name="robots" content="{'noindex,follow' if p.get('noindex') else 'index,follow'}">{gtag_block(p.get('gtag'))}{pixel_block(p.get('pixel'))}
 <meta property="og:type" content="{'website' if p['slug']=='' else 'article'}">
 <meta property="og:title" content="{strip(p['title'])}">
 <meta property="og:description" content="{strip(p['desc'])}">

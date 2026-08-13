@@ -74,7 +74,11 @@ no-srcset path are both correct and CI still needs no image library.
 Source resolution is the one thing the tool can't fix. `storefront-south-okc`
 (188×314) and `ceiling-fans-aisle` (188×189) came in as thumbnails and look soft
 on a high-DPI phone. If full-size originals ever turn up, `prep_photos.py add`
-over the same name is the whole job.
+over the same name is the whole job — that is exactly how
+`storefront-midwest-city` was fixed in Aug 2026, going from a 600×338 screenshot
+to a 1206×677 original. It gained an `@800` derivative it could not previously
+produce, and the phone file got *smaller* (17 KB → 15 KB) because the resize now
+starts from real detail instead of an already-compressed thumbnail.
 
 The Wix CDN resize transforms do work (`/v1/fill/w_800,h_600,q_80/` appended to
 a media URL) if this is ever reversed.
@@ -257,6 +261,34 @@ CAMPAIGN_PAGES = [dict(
 measurement with no conversion event. The tag is emitted **only** on pages that
 ask for it. The site carries no analytics by default and that is on purpose:
 nothing to consent to, nothing blocking first paint.
+
+### GA4 vs the Meta pixel — they are not alternatives
+
+GA4 does capture every traffic source, so as *measurement* it is the right and
+sufficient tool: it will tell you a visitor arrived from Facebook, from Google
+organic, from an AI assistant, or direct. Nothing else is needed to answer
+"where is traffic coming from".
+
+What GA4 cannot do is talk back to Meta. The pixel exists to send conversion
+signal into Meta's ad auction so delivery optimises toward people who convert,
+and to build retargeting audiences. GA4 has no path into that system, and
+Google's own tags have no path into it either.
+
+So the rule is simple:
+
+- **Not running Meta ads?** No pixel. GA4 already tells you what Facebook
+  traffic did, and an unused pixel is a third-party script and a consent
+  liability for nothing.
+- **Running Meta ads?** Add `pixel=` to the pages in that campaign's path.
+  Delivery optimisation is the entire reason, and it needs the signal.
+
+```python
+pixel="1234567890123456"
+pixel=dict(id="1234567890123456", event="Lead")   # PageView always fires too
+```
+
+Same opt-in shape as `gtag`, same isolation — emitted only on pages that ask.
+Meta's `<noscript>` fallback pixel is included.
 
 The IDs are written into public page source, so only ever put real measurement
 IDs in that field. This repo is public.
