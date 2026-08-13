@@ -1525,8 +1525,8 @@ def build_pages(L):
   </div>
   <div class="card">
     <span class="eyebrow">On the shelf now</span>
-    <h2>Visions Quality Coatings paint &mdash; $21.99 a gallon</h2>
-    <p>High-performance Workhorse interior and exterior latex, in 1-gallon and 5-gallon buckets.</p>
+    <h2>Visions Quality Coatings paint &mdash; $21.99 a gallon, $99 the 5-gallon bucket</h2>
+    <p>High-performance Workhorse interior and exterior latex, in 1-gallon cans and 5-gallon buckets.</p>
     <ul>
       <li><b>Premium performance, warehouse prices.</b> Workhorse blends deliver national-brand durability, hide and
       coverage at a closeout discount &mdash; smooth for DIY, consistent for pros.</li>
@@ -1568,7 +1568,8 @@ def build_pages(L):
      "$8 per 24-lb bag and $601 per 2,000-lb supersack. All summer: IPEMA-certified chunk rubber nuggets at "
      "$500 per supersack, pickup only. Volume discounts available."),
     ("Do you carry paint?",
-     "Yes &mdash; Visions Quality Coatings Workhorse interior and exterior latex at $21.99 a gallon, in 1-gallon "
+     "Yes &mdash; Visions Quality Coatings Workhorse interior and exterior latex at $21.99 a gallon or $99 for the "
+     "5-gallon bucket, in 1-gallon "
      "and 5-gallon buckets."),
     ("What are your hours?",
      "Both stores: Tuesday through Saturday 9:00 AM to 6:00 PM, Sunday 10:00 AM to 6:00 PM, closed Monday."),
@@ -1597,7 +1598,8 @@ def build_pages(L):
              "$8 per 24-lb bag and $601 per 2,000-lb supersack. All summer: IPEMA-certified chunk rubber nuggets at "
              "$500 per supersack, pickup only. Volume discounts available."),
             ("Do you carry paint?",
-             "Yes — Visions Quality Coatings Workhorse interior and exterior latex at $21.99 a gallon, in 1-gallon "
+             "Yes — Visions Quality Coatings Workhorse interior and exterior latex at $21.99 a gallon or $99 for the "
+             "5-gallon bucket, in 1-gallon "
              "and 5-gallon buckets."),
             ("What are your hours?",
              "Both stores: Tuesday through Saturday 9:00 AM to 6:00 PM, Sunday 10:00 AM to 6:00 PM, closed Monday."),
@@ -2235,7 +2237,7 @@ def build_pages(L):
         extra=lambda L: f'<div style="margin:1.4rem 0">{cat_grid(L)}</div>' + f'''
 <div class="split" style="margin-top:1.2rem">
   <div class="card"><span class="eyebrow">Also always here</span><h3>Paint</h3>
-  <p>Visions Quality Coatings Workhorse interior and exterior latex, $21.99 a gallon, in 1-gallon and 5-gallon buckets.</p></div>
+  <p>Visions Quality Coatings Workhorse interior and exterior latex, $21.99 a gallon or $99 for the 5-gallon bucket.</p></div>
   <div class="card"><span class="eyebrow">Also always here</span><h3>Rubber mulch</h3>
   <p>IPEMA-certified chunk rubber nuggets: $8 per 24-lb bag, $601 per 2,000-lb supersack, $500 summer special, pickup only.
   <a href="{L('rubbermulchokc')}">See mulch details</a>.</p></div>
@@ -2267,13 +2269,20 @@ def build_pages(L):
               "a gallon, waterproof LVP from $2.19/sf. Two OKC-metro stores."),
         h1="Deals on the floor right now",
         lead="Standing prices that beat retail, plus whatever landed this week.",
-        products=[dict(
-            name="Visions Quality Coatings Workhorse interior and exterior latex paint",
-            desc=("Workhorse interior and exterior latex paint in 1-gallon and 5-gallon buckets, $21.99 a gallon "
-                  "every day at Jameson's Discount Home Improvement Warehouse in the Oklahoma City metro. "
-                  "Remanufactured premium paint with national-brand performance."),
-            price="21.99", brand="Visions Quality Coatings", category="Paint")],
-        chips=[("$500", "supersack, summer special"), ("$21.99", "Visions paint, per gallon"),
+        products=[
+            dict(name="Visions Quality Coatings Workhorse latex paint, 1 gallon",
+                 desc=("Workhorse interior and exterior latex paint, $21.99 a gallon every day at Jameson's "
+                       "Discount Home Improvement Warehouse in the Oklahoma City metro. Remanufactured premium "
+                       "paint with national-brand performance."),
+                 price="21.99", brand="Visions Quality Coatings", category="Paint",
+                 photo="0172ec_e44824fd8c3d40e3b8cb4db9b7c5b56b~mv2.jpg"),
+            dict(name="Visions Quality Coatings Workhorse latex paint, 5-gallon bucket",
+                 desc=("Workhorse interior and exterior latex paint in a 5-gallon bucket, $99 at Jameson's "
+                       "Discount Home Improvement Warehouse in Midwest City and south Oklahoma City. "
+                       "Remanufactured premium paint with national-brand performance."),
+                 price="99.00", brand="Visions Quality Coatings", category="Paint",
+                 photo="0172ec_e44824fd8c3d40e3b8cb4db9b7c5b56b~mv2.jpg")],
+        chips=[("$21.99", "Visions paint, per gallon"), ("$99", "Visions paint, 5-gallon bucket"),
                ("$2.19+", "waterproof LVP, per sq ft")],
         paras=[
             "We put our discounts up front. That is the business model: the price on the tag is already the low "
@@ -2304,8 +2313,8 @@ def build_pages(L):
   <p>IPEMA-certified chunk rubber nuggets, 2,000-lb supersack, pickup only. Regular price $601; bags are $8 for 24 lb.
   <a href="{L('bulk-rubber-mulch')}">Bulk details</a>.</p></div>
   <div class="card"><span class="eyebrow">Every day</span><h3>Visions paint &mdash; $21.99 a gallon</h3>
-  <p>Workhorse interior and exterior latex in 1-gallon and 5-gallon buckets. Remanufactured premium paint,
-  national-brand performance.</p></div>
+  <p>Workhorse interior and exterior latex. $21.99 the gallon, or $99 for the 5-gallon bucket &mdash; five gallons
+  bought singly would be $109.95. Remanufactured premium paint, national-brand performance.</p></div>
   <div class="card"><span class="eyebrow">Every day</span><h3>Waterproof LVP &mdash; from $2.19/sf</h3>
   <p>Rigid-core, 12&ndash;20 mil wear layer, manufacturer warranty. Lot pricing runs $2.19&ndash;$2.69/sf.
   <a href="{L('flooring')}">Flooring details</a>.</p></div>
