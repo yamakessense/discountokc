@@ -822,17 +822,55 @@ PHOTOS = {
   ],
   "contact": [],
 }
-WIXCDN = "https://static.wixstatic.com/media/"
+PHOTO_DIR = os.path.join(ASSETS_DIR, "photos")
+
+
+def photo_id(filename):
+    """Wix media name -> the stable hash we store the local copy under."""
+    return filename.split("_", 1)[1].split("~")[0]
+
+
+def webp_size(path):
+    """Width/height of a WebP, parsed by hand so the build needs no libraries.
+
+    Emitting real dimensions on every <img> is what stops the page jumping
+    around as photos load.
+    """
+    with open(path, "rb") as fh:
+        d = fh.read(40)
+    fourcc = d[12:16]
+    if fourcc == b"VP8X":
+        return int.from_bytes(d[24:27], "little") + 1, int.from_bytes(d[27:30], "little") + 1
+    if fourcc == b"VP8L":
+        b = int.from_bytes(d[21:25], "little")
+        return (b & 0x3FFF) + 1, ((b >> 14) & 0x3FFF) + 1
+    if fourcc == b"VP8 ":
+        i = d.index(b"\x9d\x01\x2a")
+        return (int.from_bytes(d[i + 3:i + 5], "little") & 0x3FFF,
+                int.from_bytes(d[i + 5:i + 7], "little") & 0x3FFF)
+    raise ValueError("not a WebP: " + path)
+
+
+def photo_tag(filename, alt, cls="", eager=False):
+    """Photos are committed to assets/photos/ — the site serves its own images.
+
+    The originals still live in the Wix Media Manager; these are resized copies,
+    so nothing there was moved or deleted.
+    """
+    pid = photo_id(filename)
+    w, h = webp_size(os.path.join(PHOTO_DIR, pid + ".webp"))
+    load = ('fetchpriority="high" decoding="async"' if eager
+            else 'loading="lazy" decoding="async"')
+    c = f' class="{cls}"' if cls else ""
+    return (f'<img{c} src="{BASE}/assets/photos/{pid}.webp" alt="{alt}" '
+            f'width="{w}" height="{h}" {load}>')
 
 
 def photo_strip(slug, heading="On the floor"):
-    """Photos are served straight from the Wix CDN — nothing to host or migrate."""
     shots = PHOTOS.get(slug) or []
     if not shots:
         return ""
-    cards = "".join(
-        f'<figure class="shot"><img src="{WIXCDN}{f}" alt="{alt}" loading="lazy" decoding="async"></figure>'
-        for f, alt in shots)
+    cards = "".join(f'<figure class="shot">{photo_tag(f, alt)}</figure>' for f, alt in shots)
     return (f'<div class="shots-head"><span class="eyebrow">{heading}</span></div>'
             f'<div class="shots">{cards}</div>')
 
@@ -1142,7 +1180,7 @@ def build_pages(L):
     </div>
   </div>
   <div class="hero-shot">
-    <img src="{WIXCDN}{HERO["photo"]}" alt="{HERO["photo_alt"]}" width="900" height="620">
+    {photo_tag(HERO["photo"], HERO["photo_alt"], eager=True)}
     <div class="hero-badge"><b>{HERO["badge_big"]}</b><span>{HERO["badge_small"]}</span></div>
   </div>
 </div>
@@ -2029,7 +2067,7 @@ def full_page(p, body, L):
 <meta name="twitter:description" content="{strip(p['desc'])}">
 <meta name="twitter:image" content="{SITE}/assets/og-card.png">
 <meta name="theme-color" content="#45579F">
-<link rel="preconnect" href="https://static.wixstatic.com" crossorigin>
+{'<link rel="preconnect" href="https://i.ytimg.com" crossorigin>' if VIDEOS.get(p['slug']) else ''}
 {FONTS}
 <link rel="stylesheet" href="{BASE}/assets/site.css">
 <link rel="icon" href="{BASE}/assets/favicon.ico" sizes="any">
@@ -2065,11 +2103,8 @@ def build_deploy():
     os.makedirs(os.path.join(SITEDIR, "assets"), exist_ok=True)
     with open(os.path.join(SITEDIR, "assets", "site.css"), "w", encoding="utf-8") as f:
         f.write(CSS)
-    # Every binary in assets/ (logo, favicons, social card) ships as-is.
-    for name in sorted(os.listdir(ASSETS_DIR)):
-        src = os.path.join(ASSETS_DIR, name)
-        if os.path.isfile(src):
-            shutil.copyfile(src, os.path.join(SITEDIR, "assets", name))
+    # Everything in assets/ ships as-is: logo, favicons, social card, photos/.
+    shutil.copytree(ASSETS_DIR, os.path.join(SITEDIR, "assets"), dirs_exist_ok=True)
 
     # Bing's crawler, and plenty of feed readers and link unfurlers, request
     # /favicon.ico straight off the site root and never read the <link> tags.

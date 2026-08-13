@@ -29,15 +29,31 @@ Options, if this is ever picked back up:
 Parked in Aug 2026: the business doesn't send many campaigns, so a signup form
 feeding a rarely-mailed list wasn't worth the moving parts.
 
-## Wix CDN image transforms — confirmed working
+## Photos are now served by the site itself (Aug 2026)
 
-The handoff flagged this as untested. It works: appending
-`/v1/fill/w_800,h_600,q_80/` (plus the filename again) to a `static.wixstatic.com`
-media URL returns a resized image. Verified against the logo original.
+All 29 photos were pulled out of the Wix CDN, resized to 1200px max and
+converted to WebP, and committed to `assets/photos/`. 8.6 MB of originals became
+2.4 MB. Several were 3264px originals the browser was shrinking on every visit.
 
-**Not yet applied.** Several source photos in `PHOTOS` are 3264px originals being
-downscaled by the browser. Applying transforms is a straight page-speed win and
-touches only how the URL is built, not which photo is used.
+**The originals were not touched.** They're still in the Wix Media Manager;
+these are resized copies. Nothing there was moved or deleted.
+
+Filenames are the Wix media hash — `photo_id()` in `build.py` derives it, so a
+`PHOTOS` entry still reads as its Wix name and the local file is found from it.
+To add a photo: upload to Wix as usual, then pull it down the same way (there's
+a one-off script in the session scratchpad, easy to rewrite) or drop the file
+straight into `assets/photos/` named after its hash.
+
+`build.py` reads each WebP's real dimensions at build time via `webp_size()`, a
+hand-rolled header parser, so every `<img>` carries width and height and the
+page doesn't jump as photos load. No image library needed on CI.
+
+The Wix CDN resize transforms do work (`/v1/fill/w_800,h_600,q_80/` appended to
+a media URL) if this is ever reversed.
+
+**What Wix is still needed for:** the 4,000 contacts and email campaigns, and
+hosting the live discountokc.com until DNS cutover. The website itself no longer
+depends on it at all.
 
 ## Condition language
 
