@@ -161,28 +161,26 @@ sure the site says the right thing.
 
 Ordered by what will actually move the needle.
 
-**1. Finish the answer-first rewrite.** This is the big one and it is the thing
-you were frustrated about. Your pages used to have no headings that matched
-anything a person types — the only headings on the whole site were "Questions,
-answered" and "Come see it in person." That is why you only came up for
-"Jameson's."
-
-Three pages are now rebuilt around real questions — flooring, lighting and
-vanities. They carry headings like *"How much does it cost to floor a house in
-Oklahoma City?"* with the answer in the first two sentences.
-
-**Nine pages still need it:** bath, kitchen, patio, tools, both mulch pages,
-inventory, deals and the home page. The home page should become the hub that
-links down into the others.
-
-**2. Self-host the fonts.** The site currently fetches three fonts from Google
-on every page load, and the page cannot show text until that finishes. Moving
-them into the site would make it noticeably faster on a phone. Half a day.
-
-**3. Add an email signup that works.** Currently parked. A static site cannot
+**1. Add an email signup that works.** Currently parked. A static site cannot
 safely hold a password, so a signup form needs a small piece of middleware —
 about thirty lines on Cloudflare's free tier. Only worth doing if you actually
 want to grow the mailing list.
+
+**2. Sort out the Google tags on 405rubbermulch.com.** Not this site, and not
+something I can fix from here — that site's code is in a different repository I
+can't push to, and the answer isn't in the code anyway. Four Google tag IDs are
+firing on it, including **two different Google Ads accounts**, and you told me
+tags there are reporting into analytics accounts for both businesses. If one of
+those Ads accounts is discountokc's, then every 405rubbermulch visitor is being
+counted in discountokc's ad data and both accounts are optimising on the wrong
+traffic. Worth checking before more ad money goes through either one. Open
+Google Ads → account switcher and GA4 → Admin → Property and write down which
+business owns each ID. **Don't delete any tag before that** — a deleted
+conversion tag loses its history silently. Details are in NOTES.md.
+
+**3. The one small fix on 405rubbermulch.com.** Its thank-you page — the
+conversion page — is the only page on that site with no canonical tag. It should
+have one. Same repository problem: I can tell you, I can't do it from here.
 
 ---
 
@@ -225,6 +223,28 @@ For your own record. Everything is committed and pushed to the branch
 - **Search visibility plumbing:** the answer-first structure described above,
   product listings for paint, mulch and flooring, and a robots file that
   explicitly welcomes ChatGPT, Claude, Perplexity and Google's AI crawlers.
+- **The answer-first rewrite is finished.** This was the big one and the thing
+  you were frustrated about. Your pages used to have no headings matching
+  anything a person types — the only two headings on the whole site were
+  "Questions, answered" and "Come see it in person," which is why you only came
+  up for "Jameson's." Every page now leads with real questions and answers each
+  one in its first two sentences: *"How much does it cost to floor a house in
+  Oklahoma City?"*, *"Are scratch-and-dent bathtubs worth buying?"*, *"When is
+  the best time to buy patio furniture in Oklahoma?"*, *"Is rubber mulch cheaper
+  than wood mulch over time?"*, *"Can I haul a 2,000-pound supersack in a pickup
+  truck?"* — thirty-seven of them across the site. The home page is now the hub
+  and links down into each department, and the department pages link across to
+  each other, so somebody who lands on tools finds the flooring they need the
+  tools for.
+- **The site no longer waits on Google to show text.** The three fonts were
+  being fetched from Google on every page load, and nothing could paint until
+  that finished. They now live in the site itself. A page with no video on it
+  reaches out to nobody.
+- **Two things I put on the site that you should read and correct me on if I
+  have them wrong:** a five-step method for repairing a chip in an acrylic tub
+  (on the bath page), and a table of the standing prices (on the deals page).
+  The table says plainly that $601 is the standing supersack price and the $500
+  summer special is not one of the standing numbers.
 - **You can now throw up a campaign page** with its own Google tag or Meta
   pixel by adding one block to the build file. It stays off the main navigation
   and can be kept out of search.

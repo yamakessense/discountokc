@@ -709,13 +709,76 @@ footer a:hover{color:#fff}
 }
 """
 
-# Weights match the design system's tokens/fonts.css import.
-FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
-         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link href="https://fonts.googleapis.com/css2?'
-         'family=Archivo:wght@400;500;600;700;800;900&'
-         'family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&'
-         'family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">')
+# ------------------------------------------------------------------- fonts
+#
+# The three families are served by the site itself, out of assets/fonts/. They
+# used to come from fonts.googleapis.com, which meant a stylesheet on a third
+# party had to be fetched, parsed and its font files fetched in turn before any
+# text could paint — a render-blocking round trip to another host on the
+# critical path of every page. Nothing outside this domain is needed for text
+# now.
+#
+# Each file is the variable font, so one file covers every weight the design
+# tokens ask for: Archivo 400-900, Public Sans 400-800 roman and italic, Spline
+# Sans Mono 400-600. The latin and latin-ext subsets are separate files and the
+# unicode-range on each decides which gets downloaded, so an English page pulls
+# the latin file alone and never touches latin-ext.
+#
+# To refresh them, re-fetch the css2 URL for these families with a browser
+# user-agent and pull the woff2 each @font-face points at. Google revs the
+# version directory (v25, v21, v13) when a family is updated; the old files keep
+# working, so this is not urgent maintenance.
+FONT_FACES = [
+    # (family, style, weight range, file stem, extra descriptors)
+    ("Archivo", "normal", "400 900", "archivo", "font-stretch:100%;"),
+    ("Public Sans", "normal", "400 800", "public-sans", ""),
+    ("Public Sans", "italic", "400 800", "public-sans-italic", ""),
+    ("Spline Sans Mono", "normal", "400 600", "spline-sans-mono", ""),
+]
+
+SUBSETS = {
+    "latin": ("U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,"
+              "U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"),
+    "latin-ext": ("U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,"
+                  "U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,"
+                  "U+2C60-2C7F,U+A720-A7FF"),
+}
+
+# The two faces that paint the first screen: Archivo sets every heading and
+# Public Sans every paragraph. Preloading them starts the download alongside
+# the stylesheet instead of after it has been parsed. The mono and italic faces
+# carry small amounts of text and are left to load normally.
+FONT_PRELOAD = ["archivo-latin", "public-sans-latin"]
+
+
+def font_faces(prefix=""):
+    """@font-face rules pointing at local files.
+
+    `prefix` is what to put in front of `fonts/…`, because the same rules are
+    served two ways: from assets/site.css, where a bare `fonts/…` already
+    resolves inside assets/, and inlined into preview.html at the repo root,
+    where it needs `assets/`.
+    """
+    out = []
+    for fam, style, weight, stem, extra in FONT_FACES:
+        for sub, urange in SUBSETS.items():
+            out.append(
+                f'@font-face{{font-family:"{fam}";font-style:{style};font-weight:{weight};'
+                f'{extra}font-display:swap;'
+                f'src:url("{prefix}fonts/{stem}-{sub}.woff2") format("woff2");'
+                f'unicode-range:{urange}}}')
+    return "\n".join(out) + "\n"
+
+
+def font_preload(prefix):
+    """Preload links for the two faces the first screen needs.
+
+    `crossorigin` is required even though the files are same-origin: fonts are
+    fetched in anonymous CORS mode, and a preload without it downloads a second
+    copy the font never uses.
+    """
+    return "".join(f'<link rel="preload" href="{prefix}fonts/{stem}.woff2" as="font" '
+                   f'type="font/woff2" crossorigin>' for stem in FONT_PRELOAD)
 
 # Stroke icons, 2px, no emoji anywhere. Paths are the design system's icons.js
 # set (Lucide). Keys keep their existing names so call sites are unchanged;
@@ -1561,6 +1624,86 @@ def build_pages(L):
     P = []
 
     # ---------------------------------------------------------------- HOME
+    # The home page is the pillar. Each block answers a question somebody types
+    # and links down into the cluster page that carries the full answer, so the
+    # site has a hub rather than fifteen unconnected leaves.
+    home_sections = [
+        ("What does Jameson's Discount Home Improvement Warehouse sell?",
+         "Name-brand flooring, bathroom vanities, bath and kitchen fixtures, lighting and ceiling fans, tools, patio "
+         "furniture, paint and playground-certified rubber mulch &mdash; all bought as closeout, overstock and "
+         "end-of-line lots and sold at up to 50% off retail from two Oklahoma City metro stores.",
+         [f'<ul>'
+          f'<li><b><a href="{L("flooring")}">Flooring</a></b> &mdash; waterproof rigid-core luxury vinyl plank with '
+          f'a manufacturer warranty, plus select porcelain tile. The highest-volume category in the building.</li>'
+          f'<li><b><a href="{L("vanities")}">Bathroom vanities</a></b> &mdash; compact half-bath singles up to '
+          f'72-inch doubles, including Vanity Art and Wyndham Collection pieces, many complete with tops.</li>'
+          f'<li><b><a href="{L("bath")}">Bath</a></b> &mdash; toilets, tubs, faucets and shower panel systems from '
+          f'brands like Kohler and Moen, plus a scratch-and-dent line priced for its condition.</li>'
+          f'<li><b><a href="{L("kitchen")}">Kitchen</a></b> &mdash; sinks, faucets, fixtures and cabinet lots.</li>'
+          f'<li><b><a href="{L("lighting")}">Lighting &amp; ceiling fans</a></b> &mdash; the deepest single category '
+          f'here, at times a thousand fans across the two stores, indoor and outdoor.</li>'
+          f'<li><b><a href="{L("tools")}">Tools</a></b> &mdash; name-brand power and hand tools. The fastest-moving '
+          f'lots in the store.</li>'
+          f'<li><b><a href="{L("patio")}">Patio &amp; outdoor</a></b> &mdash; sets and outdoor decor, arriving '
+          f'through the season.</li>'
+          f'<li><b>Paint</b> &mdash; Visions Workhorse interior and exterior latex, $21.99 a gallon or $99 for the '
+          f'5-gallon bucket.</li>'
+          f'<li><b><a href="{L("rubbermulchokc")}">Rubber mulch</a></b> &mdash; IPEMA-certified chunk rubber nuggets, '
+          f'$8 per 24-lb bag and $601 per 2,000-lb supersack, with '
+          f'<a href="{L("bulk-rubber-mulch")}">truckload delivery</a> across four states.</li>'
+          f'</ul>',
+          f'What is not stocked: windows and screen doors, both custom made-to-opening items. '
+          f'<a href="{L("inventory")}">What&rsquo;s in stock</a> covers the full list, and '
+          f'<a href="{L("deals")}">deals</a> carries the standing prices.']),
+        ("How can a store sell name brands at half of retail?",
+         "By buying the lots a retailer cannot keep. Jameson's Discount Home Improvement Warehouse buys closeout, "
+         "overstock, end-of-line, return-to-vendor and trailer clear-out loads outright by the truckload, then prices "
+         "them to move. The product is the same running-line, in-box name brand; the buying is what differs.",
+         ["Closeout lots are one-time buys. There is no reorder and no back room, so if you see what you need at the "
+          "price you want, that is the day to buy it. New truckloads land weekly and the good pieces go first.",
+          "Condition is disclosed rather than claimed. Most of the floor is name-brand running-line product in the "
+          "box. Some of it is open-box, and some is scratch-and-dent priced for the damage, which staff will point out "
+          "before you buy. Everything has a place and a price.",
+          f"Half the business is the other direction. Manufacturers, big-box stores and distribution centers move "
+          f"return-to-vendor freight, reverse-logistics loads, trailer clear-outs and vendor buybacks through "
+          f"Jameson's, bought outright and up front. <a href=\"{L('about')}\">About Jameson's</a> has the detail, and "
+          f"loads route to <a href=\"mailto:b2b@discountokc.com\">b2b@discountokc.com</a>."]),
+        ("Where is Jameson's, and when is it open?",
+         "Two stores in the Oklahoma City metro: 7010 SE 15th Street, Midwest City (405-206-8111) and 8100 S. Santa "
+         "Fe Ave, Oklahoma City near I-240 (405-479-7918). Both stores: Tuesday through Saturday 9:00 AM to 6:00 PM, "
+         "Sunday 10:00 AM to 6:00 PM, closed Monday.",
+         ["The Midwest City store is the one with Big Jim, the 52-foot blue dinosaur, out front. The south OKC store "
+          "is on S. Santa Fe Ave just off I-240.",
+          "Pricing is the same at both stores, but the stock differs, because lots get split between the two "
+          "buildings. Call the one you plan to visit and staff will walk the floor before you drive out. Sales are in "
+          "store &mdash; there is no online catalog, because stock turns weekly.",
+          f"Ten years in the Oklahoma City metro, family owned and operated. "
+          f"<a href=\"{L('location')}\">Store locations and directions</a>."]),
+        ("What is the cheapest way to remodel a house in Oklahoma City?",
+         "Buy the material through a closeout channel and do the work that is not plumbing or panel work yourself. "
+         "Flooring, a vanity, a faucet, a light fixture and paint are all do-it-yourself jobs, and at Jameson's the "
+         "material for every one of them comes at up to half of retail.",
+         ["Labor is the larger half of most remodel quotes, and it costs the same whether the material came from a "
+          "big-box store or a closeout warehouse. Removing labor from the jobs that do not need a license is the "
+          "biggest saving available on a remodel.",
+          f"<ol>"
+          f"<li><b><a href=\"{L('flooring')}\">Floor first.</a></b> Click-lock plank floats over the existing "
+          f"subfloor and cuts with a box knife. Lay it before the cabinets go in.</li>"
+          f"<li><b><a href=\"{L('vanities')}\">Vanity next.</a></b> Match the footprint of the old cabinet so the "
+          f"supply lines and drain land where they already are.</li>"
+          f"<li><b><a href=\"{L('bath')}\">Fixtures after that.</a></b> A faucet or a toilet is an afternoon. Shower "
+          f"panels beat a tiled surround on both material and labor.</li>"
+          f"<li><b><a href=\"{L('lighting')}\">Lighting last.</a></b> Breaker off, wire for wire. Dated ceiling fans "
+          f"are the single thing that makes a house read old.</li>"
+          f"<li><b>Paint to finish.</b> Visions Workhorse latex, $21.99 a gallon or $99 the 5-gallon bucket.</li>"
+          f"</ol>",
+          "Where a licensed tradesman earns the fee: moving supply lines or drains, cutting into a stone top, new "
+          "circuits and anything at the panel. Everything else on that list is homeowner work.",
+          f"Two things move below the tag and neither is posted on a sign &mdash; 10% off for military on brand-new "
+          f"running-line vinyl plank, and take-all pricing on the last of a line. They do not stack. "
+          f"<a href=\"{L('deals')}\">Deals</a> has both in full."]),
+    ]
+
     P.append(dict(
         slug="", nav="", kind="home",
         title=f"{BIZ} | Name-Brand Closeout Prices &mdash; OKC &amp; Midwest City",
@@ -1641,6 +1784,10 @@ def build_pages(L):
       right now before you drive out.</p></div>
   </div>
 </div></section>
+<section><div class="wrap">
+  <span class="eyebrow">Answers</span>
+  {sections_html(home_sections)}
+</div></section>
 <section class="tint"><div class="wrap">
   <div class="sechead"><span class="eyebrow">Good to know</span><h2>Frequently asked questions</h2></div>
   {faq_html([
@@ -1677,6 +1824,7 @@ def build_pages(L):
   </div>
 </div></section>
 ''',
+        sections=home_sections,
         faq=[
             ("Is your rubber mulch playground certified?",
              "Yes — IPEMA-certified chunk rubber nuggets, in stock for pickup at Jameson's."),
@@ -1948,6 +2096,73 @@ def build_pages(L):
             "the money that buys the fixtures.",
             "Selection changes fast. Call either store and staff will tell you what's on the floor right now.",
         ],
+        sections=[
+            ("Are scratch-and-dent bathtubs and bath fixtures worth buying?",
+             "Yes, once you know where the damage is. A Vanity Art acrylic tub with a chip or a scuff costs a fraction "
+             "of a perfect one at Jameson's Discount Home Improvement Warehouse, and on a tub set into an alcove the "
+             "marked face usually ends up against a wall where nobody will ever see it.",
+             ["Two questions settle whether a damaged unit is a bargain. Is the damage cosmetic or structural? And "
+              "will it still be visible once the unit is installed? A scuff on an apron that faces a stud wall costs "
+              "nothing at all. A crack through a mounting flange is a different item.",
+              "Most of the floor at Jameson's is not scratch-and-dent. Toilets, tubs and faucets from brands like "
+              "Kohler and Moen come in as closeout, overstock and end-of-line lots, in the box. The scratch-and-dent "
+              "line is separate and priced for its condition, and staff point out the damage before you buy &mdash; "
+              "ask which units have it and where it is.",
+              "On a flip or a rental turn this is the easiest place to take real money out of the budget. The money "
+              "not spent on the tub covers the faucet and the drain kit."]),
+            ("Is a shower wall panel cheaper than tiling a shower?",
+             "Yes, on both material and labor. Shower wall panels at closeout pricing cost less than the tile alone, "
+             "and a panel surround needs no thinset, no grout, no waterproofing membrane and no tile setter's day "
+             "rate. Jameson's stocks panel systems at both Oklahoma City metro stores as lots arrive.",
+             ["Tile is a good surround and it is the traditional answer for a wet wall. The cost is in the trade "
+              "around it: a setter, mortar, grout, a wet saw, and waterproofing behind the whole thing. A panel "
+              "surround is a level, a caulk gun and a careful afternoon for someone comfortable with both.",
+              f"The same comparison runs through the rest of a bathroom. Waterproof rigid-core "
+              f"<a href=\"{L('flooring')}\">luxury vinyl plank</a> beats tile on the floor for the same reason, and "
+              f"a <a href=\"{L('vanities')}\">vanity swap</a> that keeps the existing footprint stays out of a "
+              f"plumber's hands entirely. Labor is what costs money on a bathroom; the fixture is the part you buy "
+              f"at closeout.",
+              "Call 405-206-8111 for the Midwest City store or 405-479-7918 for south OKC to hear what panel "
+              "systems are on the floor before you drive out."]),
+            ("How do I repair a chip in an acrylic bathtub?",
+             "Clean and lightly sand the chip, fill it with the two-part epoxy from an acrylic tub repair kit, let it "
+             "cure, then wet-sand and polish the patch flush. It is about twenty minutes of work plus cure time, on a "
+             "tub that cost a fraction of a perfect one.",
+             ["Kits are sold at any hardware store and come tinted white or with a colour-match set. The work is "
+              "straightforward; the mistakes are rushing the cure and skipping the sanding.",
+              "<ol>"
+              "<li><b>Clean the chip.</b> Degrease it with rubbing alcohol and let it dry completely. Epoxy will not "
+              "hold on soap film.</li>"
+              "<li><b>Sand it.</b> 400-grit wet-or-dry paper, enough to take off loose material and feather the edge "
+              "of the chip into the surrounding surface.</li>"
+              "<li><b>Mix and fill.</b> Mix the two parts to the kit's ratio and fill the chip slightly proud of the "
+              "surface &mdash; the patch sands down, it does not build up.</li>"
+              "<li><b>Let it cure.</b> Follow the kit's time, usually several hours, and keep water off it until it "
+              "is hard.</li>"
+              "<li><b>Wet-sand and polish.</b> 600-grit, then 1000-grit, both wet, until the patch is flush. Finish "
+              "with a plastic polish to bring the gloss back.</li>"
+              "</ol>",
+              "Ask staff to show you exactly where the damage is on a unit before you buy it. A chip on a rim you "
+              "will look at every day is worth twenty minutes of epoxy; a chip on an apron that ends up against a "
+              "wall is worth nothing at all, and you should not pay for the repair either way."]),
+        ],
+        howto=("Repair a chip in an acrylic bathtub", [
+            ("Clean the chip",
+             "Degrease the chip and the area around it with rubbing alcohol and let it dry completely. Epoxy will "
+             "not bond through soap film."),
+            ("Sand the chip",
+             "Use 400-grit wet-or-dry paper to remove loose material and feather the edge of the chip into the "
+             "surrounding acrylic."),
+            ("Mix and fill",
+             "Mix the two parts of the acrylic repair epoxy to the kit's ratio and fill the chip slightly proud of "
+             "the surface, because the patch is sanded down rather than built up."),
+            ("Let it cure",
+             "Leave the patch for the time the kit states, usually several hours, and keep water off it until it is "
+             "hard."),
+            ("Wet-sand and polish",
+             "Wet-sand with 600-grit and then 1000-grit paper until the patch sits flush, then finish with a plastic "
+             "polish to restore the gloss."),
+        ]),
         faq=[
             ("Where can I buy a discount toilet or bathtub in the OKC metro?",
              "Jameson's Discount Home Improvement — 7010 SE 15th Street in Midwest City and 8100 S. Santa Fe Ave in "
@@ -1981,6 +2196,56 @@ def build_pages(L):
             "both cases the fixture is the cost you control &mdash; get it at closeout and the project math changes "
             "fast. If you're doing a rental-property refresh, this is the cheapest way to make a kitchen read "
             "\u201cupdated\u201d without touching cabinets.",
+        ],
+        sections=[
+            ("How can I update a kitchen without replacing the cabinets?",
+             "Change the sink, the faucet and the light fixture, and paint the cabinet doors. Those four changes cover "
+             "most of what anyone actually notices in a kitchen, and all four are do-it-yourself jobs. Jameson's "
+             "Discount Home Improvement Warehouse stocks all four at closeout prices in Midwest City and south "
+             "Oklahoma City.",
+             ["The order that keeps the work simple:",
+              "<ol>"
+              "<li><b>Faucet and sink.</b> A faucet swap is a first-timer's job &mdash; shut off the stops, "
+              "disconnect the supplies, drop the new one in. A drop-in sink goes in from above in an afternoon.</li>"
+              "<li><b>Light fixture.</b> Breaker off, wire for wire. A dated flush mount over a kitchen table is one "
+              "of the cheapest things in the room to change.</li>"
+              "<li><b>Cabinet doors.</b> Visions Workhorse latex at $21.99 a gallon covers a kitchen's worth of "
+              "doors. Take the doors off, label the hinges, paint them flat on a table rather than on the wall.</li>"
+              "<li><b>Hardware last.</b> New pulls on painted doors read as new cabinets from across the room.</li>"
+              "</ol>",
+              f"An undermount sink in a stone counter is the exception &mdash; that is a fabricator's job. Everything "
+              f"else on the list is homeowner work, so the fixture is the only cost left to shop. See "
+              f"the <a href=\"{L('deals')}\">standing prices</a> for paint, and "
+              f"<a href=\"{L('lighting')}\">lighting</a> for what is on the floor in fixtures.",
+              "For a rental-property refresh this is the cheapest route to a kitchen that reads as updated. Call "
+              "405-206-8111 in Midwest City or 405-479-7918 in south OKC and staff will tell you what is on the "
+              "floor today."]),
+            ("Where can I buy discount kitchen cabinets in the Oklahoma City metro?",
+             "Kitchen cabinets come through Jameson's Discount Home Improvement Warehouse as closeout and overstock "
+             "lots at both Oklahoma City metro stores. Because every lot is a one-time buy there is no reorder and no "
+             "back room, so what is on the floor is what is available &mdash; call before you drive out.",
+             ["Most people buying a kitchen here take the cabinet run from Jameson's and pick up the last filler or "
+              "a trim piece at a big-box store. Jameson's does not need to be your only stop, and staff will say "
+              "straight when a lot does not have the depth for your layout.",
+              "Measure before you shop and bring the numbers: the wall-to-wall run, the ceiling height, and where "
+              "the sink, range and refrigerator openings fall. Closeout stock is what it is, and those three numbers "
+              "are what let staff tell you in a minute whether anything on the floor fits.",
+              f"What Jameson's does not carry is worth knowing too. Windows and screen doors are custom, made-to-"
+              f"opening items and are not stocked &mdash; see <a href=\"{L('inventory')}\">what's in stock</a> for "
+              f"the full picture."]),
+            ("Should I buy a drop-in or an undermount kitchen sink?",
+             "Buy a drop-in if you are doing the work yourself. A drop-in sink sits in the counter cut-out from "
+             "above and a homeowner can set one in an afternoon with a bead of silicone and the clips in the box. An "
+             "undermount is bonded to the underside of the counter, and in stone that is a fabricator's job.",
+             ["The counter usually decides it before preference does. Laminate counters take a drop-in, because the "
+              "particleboard core under the laminate is not a surface an undermount can hang from. Granite, quartz "
+              "and solid surface take either.",
+              "An undermount looks cleaner and lets you wipe crumbs straight into the bowl with nothing to catch on. "
+              "It costs more to install, and in a stone counter that install is not DIY work.",
+              "Check the faucet deck before you buy either one. A three-hole sink and a single-handle faucet need a "
+              "deck plate, and a sink with no deck holes means the faucet mounts through the counter instead. Bring "
+              "your cut-out measurement and the faucet you plan to use, and staff at either store will tell you "
+              "whether what is on the floor works with it."]),
         ],
         faq=[
             ("Where can I find discount kitchen sinks and faucets near Oklahoma City?",
@@ -2166,6 +2431,49 @@ def build_pages(L):
             "replacements &mdash; this is the cheapest way to build the kit. Contractors grabbing backup or crew tools "
             "do well here too.",
         ],
+        sections=[
+            ("Where can I buy discount name-brand power tools in Oklahoma City?",
+             "Jameson's Discount Home Improvement Warehouse stocks name-brand power and hand tools &mdash; Milwaukee "
+             "among them &mdash; at closeout prices at 7010 SE 15th Street in Midwest City and 8100 S. Santa Fe Ave "
+             "near I-240 in south Oklahoma City. Tools are the fastest-moving category in the building.",
+             ["Closeout lots land, get priced to move, and go. If you saw a drill you wanted, do not wait a week on "
+              "it &mdash; the lot may be gone. Brands rotate constantly, so the honest answer to \"what do you "
+              "carry\" is whatever came off the truck.",
+              "Call 405-206-8111 for Midwest City or 405-479-7918 for south OKC and staff will look at the shelf for "
+              "you. Pricing is the same at both stores, but the stock differs because lots get split between them."]),
+            ("What tools do I need to install LVP flooring myself?",
+             "A utility knife with fresh blades, a tape measure, a chalk line, spacers, a tapping block and a pull "
+             "bar will lay a click-lock floor. Rigid-core luxury vinyl plank scores and snaps by hand, so no wet saw, "
+             "no nailer and no tile setter is involved.",
+             ["The full kit for a room, in the order you reach for it:",
+              "<ul>"
+              "<li><b>Tape measure and chalk line.</b> Square the first row off the longest wall, not off the wall "
+              "that looks straightest.</li>"
+              "<li><b>Utility knife and a straightedge.</b> Score the surface, snap the plank. Keep spare blades "
+              "&mdash; a dull blade tears the wear layer instead of cutting it.</li>"
+              "<li><b>Spacers.</b> A floating floor needs an expansion gap at every wall.</li>"
+              "<li><b>Tapping block and pull bar.</b> The block seats the long edges, the pull bar closes the last "
+              "row where there is no room to swing.</li>"
+              "<li><b>Rubber mallet.</b> A framing hammer on a tapping block splits plank edges.</li>"
+              "<li><b>Knee pads.</b> The floor is the whole job.</li>"
+              "</ul>",
+              "A jigsaw or an oscillating multi-tool earns its place around door casings and toilet flanges, and both "
+              "come through in closeout lots. An undercut saw is the professional version of the same cut and is not "
+              "worth buying for one room.",
+              f"See <a href=\"{L('flooring')}\">flooring</a> for what plank is on the floor and what it costs per "
+              f"square foot."]),
+            ("Why are closeout tool prices lower than big-box prices?",
+             "The discount comes from how the tools are bought, not from what they are. Jameson's buys closeout, "
+             "overstock and end-of-line lots by the truckload &mdash; new, in-box, name-brand product a retailer or "
+             "distributor needed off the floor &mdash; and prices it to move rather than to a retail margin.",
+             ["Closeout lots are one-time buys. There is no reorder and no back room, which is the trade-off: the "
+              "price is well under retail and the selection is whatever is in the building that week.",
+              f"Routing goods back up the supply chain is slow and expensive, and product sits waiting its turn. "
+              f"Jameson's buys those loads outright &mdash; return-to-vendor freight, reverse logistics, trailer "
+              f"clear-outs and vendor buybacks. That is half the business, and it is described on the "
+              f"<a href=\"{L('about')}\">about page</a> for manufacturers and distribution centers with loads to "
+              f"move."]),
+        ],
         faq=[
             ("Is there a discount tool outlet in the OKC metro?",
              "Yes — Jameson's Discount Home Improvement in Midwest City (7010 SE 15th Street) and south OKC "
@@ -2195,6 +2503,40 @@ def build_pages(L):
             "If you're staging a home for sale, a clean patio setup is one of the cheapest square-footage upgrades "
             "there is &mdash; it turns a bare slab into an extra \u201croom\u201d in listing photos for a few hundred "
             "dollars instead of a few thousand.",
+        ],
+        sections=[
+            ("When is the best time to buy patio furniture in Oklahoma?",
+             "Early in the season, as soon as the lots land. Patio stock at Jameson's Discount Home Improvement "
+             "Warehouse is closeout inventory rather than seasonal retail, so the best sets sell first and are never "
+             "restocked. What is on the floor in April is not what is on the floor in July.",
+             ["Retail runs the opposite calendar. A big-box store carries outdoor furniture at full markup through "
+              "the spring and discounts it in August, when the season is nearly over and the good pieces are gone. "
+              "Closeout buying puts the discount on the floor in April instead.",
+              "Sets and outdoor decor run up to 50% off retail here, and the lots arrive through the season rather "
+              "than all at once. Off-season closeouts show up year-round too, not only in spring, so it is worth "
+              "asking in any month.",
+              "Call 405-206-8111 in Midwest City or 405-479-7918 in south OKC and staff will tell you what sets are "
+              "on the floor before you make the drive."]),
+            ("Does patio furniture hold up in Oklahoma weather?",
+             "The frame and the fabric decide it. Powder-coated aluminum and resin wicker over an aluminum frame "
+             "handle Oklahoma sun, heat and humidity without rusting. Steel frames rust once the coating chips, and "
+             "anything light enough for a spring wind to move needs weight, tie-down or winter storage.",
+             ["Ask at the counter what a set's frame is made of before you buy it. Aluminum, steel and resin all "
+              "look similar under a cushion, and they do not last the same number of summers on a west-facing patio.",
+              "Cushions are the other half. Solution-dyed fabric holds colour through a full season of Oklahoma sun; "
+              "printed polyester fades faster, and a faded cushion is the part that makes a set look old before the "
+              "frame does. Cushion covers wash, and replacements are cheaper than a new set.",
+              "Umbrellas and glass table tops are the pieces wind and hail take out. Drop the umbrella when you go "
+              "inside and store the glass over winter."]),
+            ("Does a patio set help a house sell?",
+             "In the photographs, yes. A clean patio setup turns a bare slab into another room in a listing, and at "
+             "Jameson's closeout pricing that is a few hundred dollars of furniture instead of a few thousand. It "
+             "goes with you when the house sells.",
+             ["A table, four chairs and an umbrella is enough. It reads as usable square footage in a photograph; a "
+              "bare slab reads as unfinished.",
+              f"The same logic covers the rest of a pre-sale refresh &mdash; "
+              f"<a href=\"{L('lighting')}\">dated ceiling fans</a> are the other thing buyers notice immediately, "
+              f"and both stores carry them by the cartload."]),
         ],
         faq=[
             ("Where can I buy discount patio furniture in Oklahoma City?",
@@ -2251,6 +2593,49 @@ def build_pages(L):
             "Buying for a school, city park or a big install? Our wholesale side handles those. "
             "405RubberMulch.com delivers flatbed truckloads across Oklahoma, Kansas, Missouri and Arkansas.",
         ],
+        sections=[
+            ("How much rubber mulch do I need for a playground?",
+             "Three numbers set the quantity: the square footage of the play area, the depth the equipment's fall "
+             "height calls for, and a margin for displacement under swings and slide exits. Bring those to either "
+             "Jameson's store, or call 405-206-8111, and staff will work the volume with you.",
+             ["Depth is not a guess. It comes from the fall height of the tallest piece of equipment on the "
+              "playground, and the equipment manufacturer's documentation states the surfacing depth that height "
+              "requires. Buy to that depth, then add for settling.",
+              "Displacement is where orders come up short. The mulch under a swing seat and at the bottom of a slide "
+              "gets kicked out every day the playground is used, and those two spots need topping back to depth "
+              "before the rest of the area does. Ordering a margin on the first buy is cheaper than a second pickup.",
+              "Rubber mulch does not decompose, so unlike wood chips there is no annual top-off just to replace what "
+              "broke down into soil. IPEMA-certified chunk rubber nuggets are $8 per 24-lb bag and $601 per 2,000-lb "
+              "supersack at both Oklahoma City metro stores, and volume discounts are available at the counter."]),
+            ("Is rubber mulch cheaper than wood mulch over time?",
+             "Over any multi-year horizon, yes. Rubber mulch costs more per square foot on the first buy and then "
+             "stops costing anything. It does not decompose, so there is no annual top-off, and it holds its "
+             "fall-height rating instead of breaking down into soil the way engineered wood fiber does.",
+             ["The comparison turns on the recurring cost, not the first invoice. Wood fiber gets topped off or "
+              "replaced on a schedule, and every one of those cycles is another purchase, another delivery and "
+              "another day of labor spreading it.",
+              "Schools are a large part of what Jameson's moves for exactly that reason. District playgrounds and HOA "
+              "common areas across Oklahoma buy season after season: the certification paperwork is straightforward, "
+              "the pickup window is flexible, and the price per fall-height rating beats wood fiber once you count "
+              "more than one season.",
+              f"If you are an HOA board or a district facilities manager pricing a play surface, call and ask for the "
+              f"volume number rather than the shelf price. For anything past a few supersacks, "
+              f"<a href=\"{L('bulk-rubber-mulch')}\">bulk and truckload</a> is the side of the business that handles "
+              f"it."]),
+            ("What does IPEMA certification mean for playground mulch?",
+             "IPEMA runs an independent third-party certification program for playground surfacing. A certified "
+             "product has been tested by an outside laboratory against the industry standard rather than to the "
+             "manufacturer's own claim, and the certificate is the document a school district, city or HOA needs for "
+             "its file.",
+             ["Jameson's stocks IPEMA-certified chunk rubber nuggets at both Oklahoma City metro stores. The same "
+              "certified product goes out in 24-lb bags and in 2,000-lb supersacks &mdash; bagging does not change "
+              "what is in it.",
+              "For a facilities manager the paperwork carries as much weight as the surface. An uncertified rubber "
+              "mulch may be perfectly good material and still fail an inspection or an insurance review, because "
+              "there is nothing on file to show what it was tested against.",
+              "Blue bagged mulch is carried locally. If you have been sourcing it out of state or waiting on freight, "
+              "it is on the floor here."]),
+        ],
         faq=[
             ("Is your rubber mulch playground certified?",
              "Yes — IPEMA-certified chunk rubber nuggets, in stock for pickup at Jameson's."),
@@ -2282,6 +2667,42 @@ def build_pages(L):
             "truckload delivery of IPEMA-certified playground rubber mulch, quoted by the load.",
             "Not sure whether you need a supersack or a truckload? Call the Midwest City store at 405-206-8111 with "
             "your square footage and required depth and we'll tell you straight.",
+        ],
+        sections=[
+            ("Should I buy rubber mulch by the supersack or by the truckload?",
+             "Buy supersacks when the job is a play area or two and you can haul them: $601 each, 2,000 pounds, "
+             "pickup at either Jameson's store in the Oklahoma City metro. Order a flatbed truckload through "
+             "405RubberMulch.com when the job is bigger than what you can move yourself.",
+             ["Pickup means the loading and the unloading are yours. Jameson's will set a supersack on your trailer; "
+              "getting it off at the other end is on you.",
+              "Truckload delivery is quoted by the load and goes out across Oklahoma, Kansas, Missouri and Arkansas "
+              "through 405RubberMulch.com, the wholesale arm of the same company. Schools, municipalities, parks "
+              "departments and contractors are the regular buyers.",
+              "Not sure which side of the line your job falls on? Call the Midwest City store at 405-206-8111 with "
+              "your square footage and the depth your equipment's fall height requires, and staff will tell you "
+              "straight."]),
+            ("Can I haul a 2,000-pound supersack in a pickup truck?",
+             "Not in a half-ton pickup. A supersack weighs a full ton, which is over the payload of most light "
+             "trucks, so bring a trailer rated for the load or a three-quarter-ton or larger truck &mdash; and have a "
+             "way to get the sack off at the other end.",
+             ["Unloading is the part people arrive without a plan for. A supersack cannot be moved by hand: it needs "
+              "a forklift, a tractor with forks, a skid steer, or a spot where the sack can be cut open and emptied "
+              "where it sits.",
+              "Call ahead so the sack is staged and ready when you get there &mdash; 405-206-8111 in Midwest City, "
+              "405-479-7918 in south OKC.",
+              f"If none of that equipment is available, bags are the alternative. IPEMA-certified chunk rubber "
+              f"nuggets are $8 per 24-lb bag, and bags load into any vehicle. See "
+              f"<a href=\"{L('rubbermulchokc')}\">bagged rubber mulch</a> for the details."]),
+            ("Who delivers bulk playground rubber mulch in Oklahoma, Kansas, Missouri and Arkansas?",
+             "405RubberMulch.com, the regional wholesale arm of Jameson's Discount Home Improvement Warehouse, "
+             "delivers flatbed truckloads of IPEMA-certified playground rubber mulch across Oklahoma, Kansas, "
+             "Missouri and Arkansas, quoted by the load. Schools, municipalities, parks departments and contractors "
+             "are the regular buyers.",
+             ["Jameson's is the retail home of the same company, so the certified product on a flatbed is the product "
+              "in the bags and supersacks at both Oklahoma City metro stores. Anything you can pick up today is "
+              "available at the counter; anything that needs a truck goes through the wholesale side.",
+              "Truckload quotes come from 405RubberMulch.com. For a supersack today, call the store: 405-206-8111 in "
+              "Midwest City, 405-479-7918 in south Oklahoma City."]),
         ],
         faq=[
             ("How much does a supersack of rubber mulch cost?",
@@ -2322,6 +2743,41 @@ def build_pages(L):
             f"eBay store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a> &mdash; 100% positive "
             "feedback across hundreds of sales, and we ship those anywhere. The floor is still where the volume is, "
             "but if you need a single obscure part, that is often the fastest way to get it.",
+        ],
+        sections=[
+            ("What does Jameson's keep in stock year-round?",
+             "Flooring, bathroom vanities, bath and kitchen fixtures, lighting and ceiling fans, tools, patio "
+             "furniture, paint and playground-certified rubber mulch are core stock at both Oklahoma City metro "
+             "stores. The specific models rotate weekly because every lot is a closeout buy, but the categories are "
+             "always in the building.",
+             ["Two things sit on the shelf at a known price all year: Visions Workhorse latex paint at $21.99 a gallon "
+              "or $99 for the 5-gallon bucket, and IPEMA-certified rubber mulch at $8 per 24-lb bag and $601 per "
+              "2,000-lb supersack. Everything else is priced by the lot.",
+              f"Ceiling fans are the deepest single category &mdash; at times a thousand of them across the two "
+              f"stores, in indoor and outdoor styles. Flooring is the highest-volume one: waterproof rigid-core "
+              f"plank at <a href=\"{L('flooring')}\">$2.19 to $2.69 a square foot</a> depending on the current lot.",
+              "You do not have to buy everything here for Jameson's to save you money. On a kitchen, most people take "
+              "the cabinets from us and pick up the last two fillers and a trim piece at a big-box store. Staff will "
+              "say straight when a lot does not have the depth for your list."]),
+            ("Does Jameson's sell windows or screen doors?",
+             "No. Windows and screen doors are custom items, sized and ordered to the opening, which is not something "
+             "a store can buy as a closeout truckload. Jameson's stocks neither at either Oklahoma City metro store, "
+             "and staff will point you to a local company that does.",
+             ["It is the most common thing people call about that is not on the floor, so it is worth saying plainly "
+              "rather than letting somebody make the drive to find out.",
+              "Everything in the category list above is stocked. If you are not sure whether a particular kind of "
+              "item counts, calling is faster than driving: 405-206-8111 in Midwest City, 405-479-7918 in south OKC."]),
+            ("How do I find out what is on the floor at Jameson's today?",
+             "Call the store you plan to visit &mdash; 405-206-8111 in Midwest City, 405-479-7918 in south Oklahoma "
+             "City &mdash; and staff will walk the floor and tell you what is actually there. Stock turns too fast "
+             "for an item-by-item catalog online.",
+             ["Pricing is the same at both stores, but the stock differs, because lots get split between the two "
+              "buildings. Ask about the store you are driving to rather than the company.",
+              "New closeout lots land weekly and popular items sell within days. If you see what you need at the "
+              "price you want, that is the day to buy it &mdash; there is no reorder on a closeout lot.",
+              f"A few one-off units and harder-to-find parts, including ceiling fan parts, are listed through the "
+              f"eBay store, <a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a>, and those ship "
+              f"anywhere."]),
         ],
         extra=lambda L: f'<div style="margin:1.4rem 0">{cat_grid(L)}</div>' + f'''
 <div class="split" style="margin-top:1.2rem">
@@ -2395,6 +2851,49 @@ def build_pages(L):
             "against a wall costs you nothing.",
             "And a 60-inch double vanity with an engineered stone top is $629 right now &mdash; a modular unit you can "
             "extend to 72 or 84 inches for less than a custom cabinet shop charges for the base alone.",
+        ],
+        sections=[
+            ("Do I need to wait for a sale to get the best price at Jameson's?",
+             "No. The discount is already on the tag. Jameson's Discount Home Improvement Warehouse prices closeout "
+             "stock to move the week it lands, so there is no sale cycle to wait for and no coupon to hunt down. One "
+             "item may go on sale in a given month, but the prices are the prices.",
+             ["New lots arrive weekly and get priced when they hit the floor. Stopping in regularly, or following the "
+              "Facebook and Instagram pages, is how people catch a lot early rather than watching for a sale.",
+              "Two things do move below the tag. Jameson's takes <b>10% off for military</b> on brand-new "
+              "running-line vinyl plank &mdash; current product, not closeout overage. And when a line gets down to "
+              "the last of it, staff will often do a take-all deal on what is left, which on flooring can mean pallet "
+              "pricing on a style or two.",
+              "They do not stack. Take-all and pallet prices are already cut well past 10%, so the military discount "
+              "does not come off on top of one. If you are buying a whole house of flooring, say so up front and "
+              "staff will tell you which of the two lands cheaper."]),
+            ("What are the standing prices at Jameson's?",
+             "Visions Workhorse latex paint is $21.99 a gallon or $99 for the 5-gallon bucket, waterproof rigid-core "
+             "LVP runs $2.19 to $2.69 a square foot depending on the lot, and IPEMA-certified rubber mulch is $8 per "
+             "24-lb bag or $601 per 2,000-lb supersack. Those hold week to week at both stores.",
+             ['<div class="tablewrap"><table><thead><tr><th>Item</th><th>Price</th></tr></thead><tbody>'
+              '<tr><td>Visions Workhorse latex paint, 1 gallon</td><td>$21.99</td></tr>'
+              '<tr><td>Visions Workhorse latex paint, 5-gallon bucket</td><td>$99.00</td></tr>'
+              '<tr><td>Waterproof rigid-core LVP, per square foot</td><td>$2.19&ndash;$2.69</td></tr>'
+              '<tr><td>IPEMA-certified rubber mulch, 24-lb bag</td><td>$8.00</td></tr>'
+              '<tr><td>Bulk rubber mulch supersack, 2,000 lb</td><td>$601.00</td></tr>'
+              '</tbody></table></div>',
+              "Five gallons of paint bought as single cans would be $109.95, so the bucket saves $10.95 on the same "
+              "paint.",
+              "The $500 supersack price on this page is a summer special, pickup only, and it is not one of the "
+              "standing numbers &mdash; the standing supersack price is $601.",
+              "Everything else on the floor is whatever came off the truck this week. Seasonal and holiday decor runs "
+              "alongside all of it, and it lands early rather than late."]),
+            ("Is scratch-and-dent worth it on a flip or a rental turn?",
+             "It is the easiest place to take real money out of a remodel budget. A Vanity Art bathtub with a chip or "
+             "a scuff costs a fraction of a perfect one, and on a tub going into an alcove the marked face usually "
+             "ends up against a wall. Ask staff to show you where the damage is.",
+             ["Acrylic repair epoxy handles the rest: sand, fill, cure, polish, about twenty minutes of work with a "
+              "kit from any hardware store.",
+              f"Most of the floor is not scratch-and-dent. It is closeout, overstock and end-of-line product in the "
+              f"box, and the damaged line is separate and priced for its condition. "
+              f"<a href=\"{L('bath')}\">Bath</a> has the detail on which units carry damage and how to judge it.",
+              "The two questions to ask about any damaged unit: is the damage cosmetic or structural, and will it "
+              "still be visible once the thing is installed?"]),
         ],
         extra=lambda L: f'''
 <div class="split" style="margin:1.3rem 0">
@@ -2820,7 +3319,7 @@ def full_page(p, body, L):
 <meta name="twitter:image" content="{SITE}/assets/og-card.png">
 <meta name="theme-color" content="#45579F">
 {'<link rel="preconnect" href="https://i.ytimg.com" crossorigin>' if VIDEOS.get(p['slug']) else ''}
-{FONTS}
+{font_preload(BASE + "/assets/")}
 <link rel="stylesheet" href="{BASE}/assets/site.css">
 <link rel="icon" href="{BASE}/assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="{BASE}/assets/favicon-32.png">
@@ -2855,7 +3354,7 @@ def build_deploy():
         shutil.rmtree(SITEDIR)
     os.makedirs(os.path.join(SITEDIR, "assets"), exist_ok=True)
     with open(os.path.join(SITEDIR, "assets", "site.css"), "w", encoding="utf-8") as f:
-        f.write(CSS)
+        f.write(font_faces() + CSS)
     # Everything in assets/ ships as-is: logo, favicons, social card, photos/.
     shutil.copytree(ASSETS_DIR, os.path.join(SITEDIR, "assets"), dirs_exist_ok=True)
 
@@ -2893,7 +3392,7 @@ def build_deploy():
     with open(os.path.join(SITEDIR, "404.html"), "w", encoding="utf-8") as f:
         f.write(f'''<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{nf['title']}</title>
-<meta name="robots" content="noindex">{FONTS}<link rel="stylesheet" href="{BASE}/assets/site.css">
+<meta name="robots" content="noindex">{font_preload(BASE + "/assets/")}<link rel="stylesheet" href="{BASE}/assets/site.css">
 <link rel="icon" href="{BASE}/assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="{BASE}/assets/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="{BASE}/assets/apple-touch-icon.png"></head><body>
@@ -2945,8 +3444,8 @@ def build_preview():
 <title>{home['title']}</title>
 <meta name="description" content="{strip(home['desc'])}">
 <meta name="theme-color" content="#45579F">
-{FONTS}
-<style>{CSS}</style>
+{font_preload("assets/")}
+<style>{font_faces("assets/")}{CSS}</style>
 <script type="application/ld+json">
 {page_schema(home)}
 </script>

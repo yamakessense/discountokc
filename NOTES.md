@@ -153,15 +153,57 @@ goes edge to edge on a phone.
 
 Nothing comes from Wix — all 29 photos are local and verified (29 referenced,
 29 on disk, 0 HTTP failures, zero `wixstatic`/`wix.com` references in `build.py`
-or in the build output). Two non-Wix dependencies remain:
+or in the build output). The fonts are now local too (below). One dependency
+remains:
 
 | What | Where | Cost |
 |---|---|---|
-| Google Fonts CSS (Archivo, Public Sans, Spline Sans Mono) | every page | render-blocking third-party request before text paints |
 | YouTube thumbnails (`i.ytimg.com`) | 16 images across 9 pages | a separate connection per thumbnail |
 
-Self-hosting the three fonts into `assets/` is the higher-value of the two and
-would make the site fully self-contained.
+A page with no video on it now touches no outside host at all. Verified in
+Chromium at 390×844 across all 15 pages: the only host requested is the site's
+own.
+
+## Fonts are self-hosted (Aug 2026)
+
+Archivo, Public Sans and Spline Sans Mono are served out of `assets/fonts/`.
+They used to come from `fonts.googleapis.com`, which put a third-party
+stylesheet on the critical path: fetch it, parse it, *then* start fetching the
+font files, all before any text could paint.
+
+Eight files, 228 KB on disk, and an English page downloads three of them
+(~98 KB):
+
+| Face | File | Covers |
+|---|---|---|
+| Archivo | `archivo-latin.woff2` | weights 400–900, all headings |
+| Public Sans | `public-sans-latin.woff2` | weights 400–800, all body text |
+| Public Sans italic | `public-sans-italic-latin.woff2` | 400–800, the few `<em>` runs |
+| Spline Sans Mono | `spline-sans-mono-latin.woff2` | 400–600, `.mono`/`.num` |
+
+Each is the **variable** font, so one file covers every weight the design
+tokens ask for — no more per-weight files. `latin-ext` versions of all four sit
+alongside them and are only downloaded if a character needs them, because the
+`unicode-range` on each `@font-face` gates the fetch.
+
+Three pieces in `build.py`:
+
+- **`font_faces(prefix)`** generates the `@font-face` rules. The prefix exists
+  because the same rules are served two ways: `site.css` lives *inside*
+  `assets/`, so a bare `fonts/…` is correct there, while `preview.html` inlines
+  the CSS at the repo root and needs `assets/fonts/…`. Getting this wrong is
+  silent — the browser just falls back to system-ui.
+- **`font_preload(prefix)`** emits preload links for Archivo and Public Sans
+  only, the two faces the first screen needs. `crossorigin` is required even
+  though the files are same-origin; without it the preload downloads a copy the
+  font never uses.
+- **`FONT_FACES` / `SUBSETS`** hold the family/weight/subset table.
+
+To refresh them: fetch the `css2` URL for the three families **with a browser
+user-agent** (Google serves TTF to unknown agents) and pull the woff2 each
+`@font-face` points at. Google revs the version directory (`v25`, `v21`, `v13`)
+when a family updates; the old files keep working, so this is not maintenance
+that needs doing on a schedule.
 
 ## AEO / GEO structure — the point of the whole site
 
@@ -207,10 +249,35 @@ Applebot-Extended, Bingbot, CCBot, Amazonbot and meta-externalagent explicitly.
 `User-agent: *` already allowed them; naming them is unambiguous to an auditor
 and survives a future tightening of the wildcard.
 
-**Done so far:** flooring, lighting and vanities carry answer-first sections.
-**Still to do:** bath, kitchen, patio, tools, rubbermulchokc, bulk-rubber-mulch,
-inventory, deals and the home page, which should become the pillar that links
-down to each cluster.
+**Done — every page carries answer-first sections** (Aug 2026). Three blocks
+each on the eleven category and landing pages, four on the home page — 37
+question-headed blocks where the site previously had two headings total. The three
+narrow pages — about, location, contact — are deliberately left alone: their
+`faq` accordions already answer their queries and they have no cluster below
+them.
+
+The home page is the pillar. Its four blocks are *what does Jameson's sell*
+(links down to every department), *how can a store sell name brands at half of
+retail* (the buying model, links to about/B2B), *where is Jameson's and when is
+it open* (the NAP and hours as retrievable text, which the home page did not
+carry before — `key_facts()` only renders on interior pages), and *what is the
+cheapest way to remodel a house in Oklahoma City* (a numbered sequence linking
+into flooring → vanities → bath → lighting).
+
+Cluster pages link sideways and up as well as the pillar linking down: bath ↔
+flooring/vanities, kitchen → deals/lighting/inventory, tools → flooring/about,
+the two mulch pages to each other, deals → bath.
+
+Two additions carry visible structured content, so the schema follows the page:
+`bath` has a five-step `howto` for repairing a chip in an acrylic tub, mirroring
+the `<ol>` in its third block, and `deals` has a standing-price table. Every
+question in every page's FAQPage node was checked against the rendered HTML —
+15 pages, 0 questions without a visible counterpart.
+
+What was *not* done, on purpose: no new `products` nodes, no price quoted in a
+block that isn't already visible on that same page, and the $500 supersack
+special is named as a summer special everywhere it appears. The deals page now
+says outright that $601 is the standing supersack price and $500 is not.
 
 ## How the site talks
 
