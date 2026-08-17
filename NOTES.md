@@ -355,6 +355,69 @@ The special will lapse and stale markup on an expired price is worse than no
 markup. Same reasoning for the $629 vanity on the deals page — a one-off
 closeout, so no Product node.
 
+## OPEN ISSUE — 405rubbermulch tags and Search Console duplicates
+
+Raised Aug 2026, not yet resolved. This concerns the **other** repo
+(`yamakessense/405rubbermulch-site`, the Hostinger-hosted 405rubbermulch.com),
+but it is written here because that repo is push-disabled from this session and
+because the two properties may be contaminating each other's data.
+
+### Four Google tag IDs are firing on 405rubbermulch.com
+
+Counted across its 13 HTML pages:
+
+| ID | Type | On how many pages |
+|---|---|---|
+| `GT-WB72BHMG` | Google tag / container | 26 references |
+| `AW-998556622` | Google **Ads** conversion account | 17 |
+| `AW-18336005673` | Google **Ads** conversion account, a second one | 17 |
+| `G-F6P1TCFK29` | GA4 property | 13 |
+
+**Two separate Google Ads accounts are configured on one site.** The owner
+reports that tags on 405rubbermulch are reporting into analytics accounts
+belonging to *both* 405rubbermulch.com and discountokc.com.
+
+If one of those AW accounts belongs to discountokc, then every 405rubbermulch
+visitor is being counted in discountokc's Ads data, and conversion optimisation
+on both accounts is learning from the wrong traffic. That is worth checking
+before any more ad spend goes through either account.
+
+**This cannot be settled from the code.** The HTML shows which IDs fire; only
+the Google Ads and GA4 admin screens show which business each ID belongs to.
+First step is to open Google Ads → account switcher and GA4 → Admin → Property,
+and write down which of `AW-998556622`, `AW-18336005673`, `G-F6P1TCFK29` and
+`GT-WB72BHMG` belongs to which domain. Then remove from each site the tags that
+are not its own.
+
+Note `AW-998556622` also appears in the discountokc-side history for a Google
+Ads conversion tag task, which is a further reason to check it carefully.
+
+Do not delete any tag until that mapping is confirmed. A deleted conversion tag
+loses history silently.
+
+### The Search Console "duplicate, not indexed" pages
+
+Partly expected, partly a real gap.
+
+**Expected, leave alone.** `.htaccess` on 405rubbermulch 301-redirects twelve
+old area-code pages (`/405-area.html`, `/918-area.html`, …) into four state
+pages. Those will always report as "Page with redirect". That is the redirect
+working, not a fault.
+
+**Also expected.** `.htaccess` has no www-vs-non-www or http-vs-https
+canonicalisation rule, so Hostinger may answer on up to four URL variants per
+page. Twelve of thirteen pages do carry `rel="canonical"` pointing at
+`https://405rubbermulch.com`, so Google should fold the variants together and
+report them as "Alternate page with proper canonical tag" — benign. Adding a
+single 301 to the canonical host in `.htaccess` would tidy it up.
+
+**A real gap.** `thank-you/index.html` is the **only page with no canonical
+tag** — and it is the conversion page, the one carrying the Ads conversion
+event. It should get one.
+
+None of this affects discountokc.com. Its 15 pages each carry a canonical, and
+the cutover keeps every URL identical.
+
 ## Never strip the head
 
 Do not remove Google verification tags, tracking scripts, or meta tags when
