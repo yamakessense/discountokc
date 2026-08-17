@@ -49,7 +49,38 @@ hand-rolled header parser, so every `<img>` carries width and height and the
 page doesn't jump as photos load. No image library needed on CI — see below for
 where the resizing actually happens.
 
-## Adding a photo — tools/prep_photos.py
+## Adding photos without touching code
+
+This is the route a non-technical person uses, and it is the one to keep
+working. Upload a photo to `assets/photos/pages/<page-slug>/` on github.com and
+it appears on that page. No build.py edit, nothing installed, works from a phone
+browser. `assets/photos/pages/README.md` is written for that person — keep it in
+plain language.
+
+Three pieces make it work:
+
+- **`dropped_photos()`** scans the folder at build time. Files with `@` in the
+  stem are skipped, because those are the responsive versions of a photo already
+  in the list — without that guard they render as duplicate cards.
+- **The filename is the alt text.** `alt_from_filename()` strips a leading `01-`
+  ordering prefix, swaps dashes and underscores for spaces, and capitalises.
+  This is the load-bearing trick: it gets real alt text out of somebody who will
+  never fill in an alt-text field.
+- **`.github/workflows/optimize-photos.yml`** runs `tools/optimize_dropped.py`
+  on any push touching that folder: Pillow converts to WebP, caps at 1200px,
+  writes `@800`/`@400`, deletes the original and commits back. It skips its own
+  commits (`github.actor != 'github-actions[bot]'`) or it would loop forever.
+
+**The build never depends on that Action having run.** `image_size()` reads
+JPEG and PNG headers as well as WebP, so a raw phone photo builds correctly —
+just heavier for the minute before the optimised version lands. Verified by
+building with a 249 KB JPEG in place, then again after conversion.
+
+Paths are percent-encoded in `photo_tag()`. Dropped filenames contain spaces,
+and a raw space in a `srcset` is not merely untidy — the spec splits candidates
+on whitespace, so it breaks the entire set.
+
+## Adding a photo — tools/prep_photos.py (curated photos)
 
 The site build stays dependency-free on purpose. All resizing happens in
 `tools/prep_photos.py`, which runs **locally, never on CI**, and commits its

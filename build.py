@@ -8,6 +8,7 @@ Edit the words in the PAGE CONTENT section, run this, commit. GitHub Actions
 also runs it automatically on every push and publishes the result.
 """
 import json, os, re, shutil, html
+from urllib.parse import quote
 
 
 # ===================== DESIGN & LAYOUT =====================
@@ -970,6 +971,79 @@ def webp_size(path):
     raise ValueError("not a WebP: " + path)
 
 
+def image_size(path):
+    """Width/height of a WebP, JPEG or PNG, still with no image library.
+
+    The optimiser Action normally converts a dropped photo to WebP before the
+    site build ever sees it. This exists so that if the Action has not run yet
+    — or somebody commits a photo by hand — the build still succeeds and the
+    page still gets real width/height attributes instead of jumping.
+    """
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".webp":
+        return webp_size(path)
+    with open(path, "rb") as fh:
+        d = fh.read()
+    if d[:8] == b"\x89PNG\r\n\x1a\n":
+        return int.from_bytes(d[16:20], "big"), int.from_bytes(d[20:24], "big")
+    if d[:2] == b"\xff\xd8":                                    # JPEG
+        i = 2
+        while i < len(d) - 9:
+            if d[i] != 0xFF:
+                i += 1
+                continue
+            m = d[i + 1]
+            if m in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+                     0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):        # SOF markers
+                return (int.from_bytes(d[i + 7:i + 9], "big"),
+                        int.from_bytes(d[i + 5:i + 7], "big"))
+            if m in (0xD8, 0xD9, 0x01) or 0xD0 <= m <= 0xD7:
+                i += 2
+                continue
+            i += 2 + int.from_bytes(d[i + 2:i + 4], "big")
+    raise ValueError("unsupported image (want webp, jpg or png): " + path)
+
+
+def alt_from_filename(name):
+    """Turn a dropped photo's filename into its alt text.
+
+    The filename *is* the alt text, which is the whole trick: naming a photo
+    `red rubber mulch supersack at the south okc store.jpg` is something anybody
+    can do from a phone, and it produces the description screen readers and
+    search engines need. A leading `01-` orders the strip and is stripped off.
+    """
+    stem = os.path.splitext(os.path.basename(name))[0]
+    stem = re.sub(r"^\d+[-_. ]+", "", stem)          # ordering prefix
+    stem = re.sub(r"[-_]+", " ", stem).strip()
+    return stem[:1].upper() + stem[1:] if stem else "Jameson's Discount Home Improvement Warehouse"
+
+
+def dropped_photos(slug):
+    """Photos a person dropped into assets/photos/pages/<slug>/, in name order.
+
+    Nothing in build.py needs editing to add one — that is the point. See
+    NOTES.md, "Adding photos without touching code".
+    """
+    d = os.path.join(PHOTO_DIR, "pages", slug or "home")
+    if not os.path.isdir(d):
+        return []
+    out, seen = [], set()
+    # .webp first, so that in the one build between a drop and the optimiser
+    # finishing, the optimised copy wins over the raw phone JPEG beside it.
+    for f in sorted(os.listdir(d), key=lambda n: (os.path.splitext(n)[1].lower() != ".webp", n)):
+        stem, ext = os.path.splitext(f)
+        # "@800"/"@400" are the responsive versions of a photo already in this
+        # list, not photos in their own right. Without this they render as
+        # duplicate cards in the strip.
+        if f.startswith(".") or "@" in stem or ext.lower() not in (".webp", ".jpg", ".jpeg", ".png"):
+            continue
+        if stem in seen:
+            continue
+        seen.add(stem)
+        out.append((os.path.join("pages", slug or "home", f), alt_from_filename(f)))
+    return sorted(out, key=lambda t: t[0])
+
+
 # Roughly what a .shots card measures at each breakpoint: one column on a
 # phone, two on a tablet, three or four on a desktop inside the container.
 PHOTO_SIZES = "(max-width:640px) 92vw, (max-width:1040px) 46vw, 400px"
@@ -988,26 +1062,41 @@ def photo_tag(filename, alt, cls="", eager=False):
     src, so this stays correct either way and the build still needs no image
     library.
     """
-    pid = photo_id(filename)
-    w, h = webp_size(os.path.join(PHOTO_DIR, pid + ".webp"))
+    # A dropped photo carries its own path and extension (pages/<slug>/x.webp);
+    # a curated PHOTOS entry is a bare Wix name that reduces to <hash>.webp.
+    if "/" in filename:
+        rel, stem = filename, os.path.splitext(filename)[0]
+    else:
+        rel = stem = photo_id(filename)
+        rel += ".webp"
+
+    w, h = image_size(os.path.join(PHOTO_DIR, rel))
     load = ('fetchpriority="high" decoding="async"' if eager
             else 'loading="lazy" decoding="async"')
     c = f' class="{cls}"' if cls else ""
 
+    # Dropped filenames are written by a person and contain spaces, so every
+    # path is percent-encoded. A raw space in a srcset is not just untidy — the
+    # spec splits candidates on whitespace, so it would break the whole set.
+    def url(p):
+        return BASE + "/assets/photos/" + quote(p.replace(os.sep, "/"))
+
     srcset = []
     for d in (400, 800):
-        if os.path.exists(os.path.join(PHOTO_DIR, f"{pid}@{d}.webp")):
-            srcset.append(f"{BASE}/assets/photos/{pid}@{d}.webp {d}w")
-    srcset.append(f"{BASE}/assets/photos/{pid}.webp {w}w")
+        if os.path.exists(os.path.join(PHOTO_DIR, f"{stem}@{d}.webp")):
+            srcset.append(f"{url(f'{stem}@{d}.webp')} {d}w")
+    srcset.append(f"{url(rel)} {w}w")
     ss = (f' srcset="{", ".join(srcset)}" sizes="{PHOTO_SIZES}"'
           if len(srcset) > 1 else "")
 
-    return (f'<img{c} src="{BASE}/assets/photos/{pid}.webp"{ss} alt="{alt}" '
+    return (f'<img{c} src="{url(rel)}"{ss} alt="{html.escape(alt, quote=True)}" '
             f'width="{w}" height="{h}" {load}>')
 
 
 def photo_strip(slug, heading="On the floor"):
-    shots = PHOTOS.get(slug) or []
+    # Dropped photos lead: they are the newest thing off the floor, and putting
+    # them first is what makes the drop-a-file workflow feel worth doing.
+    shots = dropped_photos(slug) + (PHOTOS.get(slug) or [])
     if not shots:
         return ""
     cards = "".join(f'<figure class="shot">{photo_tag(f, alt)}</figure>' for f, alt in shots)
@@ -2530,6 +2619,7 @@ def build_pages(L):
 
 # ===================== BUILD =====================
 import json, os, re, shutil, html
+from urllib.parse import quote
 
 
 OUT = os.path.dirname(os.path.abspath(__file__))

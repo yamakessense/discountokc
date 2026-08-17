@@ -1,0 +1,56 @@
+name: Optimize dropped photos
+
+# Somebody drops a photo straight off a phone into assets/photos/pages/<page>/
+# and it is a 4 MB JPEG. This converts it to WebP, caps it at 1200px, writes the
+# 800/400 versions the site serves to phones, and commits the result back.
+#
+# The site build (build.py) stays dependency-free — Pillow is installed here and
+# only here. If this Action has not run yet, the build still works: image_size()
+# reads JPEG and PNG headers too, so the page renders correctly, just heavier
+# until the optimised version lands a minute later.
+
+on:
+  push:
+    paths:
+      - 'assets/photos/pages/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: optimize-photos
+  cancel-in-progress: false
+
+jobs:
+  optimize:
+    # Do not react to our own commit — that is how these loop forever.
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: pip install --quiet pillow
+
+      - name: Convert and resize
+        id: convert
+        run: python3 tools/optimize_dropped.py
+
+      - name: Commit the optimised photos
+        if: steps.convert.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets/photos
+          git commit -m "Optimize dropped photos
+
+          Converted to WebP, capped at 1200px, with 800px and 400px versions
+          for phones. Done automatically by the optimize-photos workflow."
+          git push
