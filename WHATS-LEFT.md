@@ -15,10 +15,10 @@ phone.** Everything that makes Google trust discountokc.com is attached to the
 Here is exactly why nothing is lost:
 
 **Your page addresses stay identical.** All fifteen pages keep the same web
-addresses they have now — `/flooring/`, `/vanities/`, `/rubbermulchokc/` and so
+addresses they have now — `/flooring`, `/vanities`, `/rubbermulchokc` and so
 on. They were deliberately copied from your live Wix sitemap when the rebuild
 started, character for character. When a link on somebody else's website points
-at `discountokc.com/flooring/`, it still lands on a real page afterwards. No
+at `discountokc.com/flooring`, it still lands on a real page afterwards. No
 broken links, no redirects needed, no "page not found."
 
 **Your domain name stays the same.** Backlinks point at `discountokc.com`. That

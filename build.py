@@ -1306,6 +1306,7 @@ def footer(L):
     name-brand flooring, vanities, bath, kitchen, lighting, tools and patio at up to 50% off retail,
     plus playground-certified rubber mulch.</p>
     <a href="mailto:save@discountokc.com">save@discountokc.com</a>
+    {footer_follow()}
   </div>
   <div><h4>Shop</h4>{cats}</div>
   <div><h4>Stores</h4>
@@ -1322,6 +1323,102 @@ def footer(L):
 <div class="footbot"><span>&copy; {BIZ} &middot; Midwest City &amp; South OKC</span>
 <span class="mono">Tue&ndash;Sat 9&ndash;6 &middot; Sun 10&ndash;6 &middot; Closed Mon</span></div>
 </div></footer>'''
+
+# ---------------------------------------------------------------- socials
+# Official profile links and embeds, from the codes Jess sent (Nov 2026).
+# Every embed below is the platform's own published embed: Facebook Page
+# Plugin, TikTok creator and video embeds, Instagram post embed. Instagram has
+# no profile embed, so it gets one Reel plus a plain profile link.
+SOCIAL = {
+    "fb_mwc":   "https://www.facebook.com/profile.php?id=100063522128902",
+    "fb_south": "https://www.facebook.com/profile.php?id=100077386608929",
+    "tiktok":   "https://www.tiktok.com/@jamesonsdiscountmwc",
+    "ig_mwc":   "https://www.instagram.com/jamesons_discount_mwc/",
+}
+TIKTOK_VIDEO = "7636525718221901069"   # Midwest City store tour
+IG_REEL = "https://www.instagram.com/reel/Dappb2nAn6T/"
+
+CSS += r"""
+.social{background:var(--color-bg-warm)}
+.social-grid{display:grid;gap:var(--space-6);grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+@media(max-width:960px){.social-grid{grid-template-columns:1fr}}
+.social-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:12px;
+  padding:var(--space-4);min-height:120px;overflow:hidden}
+.social-card h3{margin:0 0 var(--space-3);font-size:1.05rem}
+.social-card .embed{display:flex;justify-content:center;min-height:80px}
+.social-card .embed>*{max-width:100%!important}
+.social-links{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-5)}
+.social-links a{font-weight:600}
+.footfollow{margin-top:var(--space-4)}
+.footfollow a{display:block}
+"""
+
+
+def social_block():
+    """Follow-us section. The three platform scripts are heavy, so nothing
+    third-party loads until the section scrolls near the screen; on a phone
+    that keeps the first paint as fast as before. Each card keeps a plain link,
+    so the section still works if a script is blocked."""
+    return f"""
+<section class="social" id="follow"><div class="wrap">
+<h2>Follow the floor</h2>
+<p class="lead">New closeout loads land every week. We post them on Facebook, TikTok and Instagram first.</p>
+<div class="social-grid">
+  <div class="social-card"><h3>Facebook &middot; Midwest City</h3>
+    <div class="embed"><div class="fb-page" data-href="{SOCIAL['fb_mwc']}" data-tabs="timeline"
+      data-width="500" data-height="500" data-small-header="false" data-adapt-container-width="true"
+      data-hide-cover="false" data-show-facepile="true">
+      <blockquote cite="{SOCIAL['fb_mwc']}" class="fb-xfbml-parse-ignore">
+      <a href="{SOCIAL['fb_mwc']}" rel="noopener">Jameson's Discount on Facebook</a></blockquote></div></div></div>
+  <div class="social-card"><h3>TikTok &middot; store tour</h3>
+    <div class="embed"><blockquote class="tiktok-embed" cite="{SOCIAL['tiktok']}/video/{TIKTOK_VIDEO}"
+      data-video-id="{TIKTOK_VIDEO}" style="max-width:605px;min-width:288px;margin:0">
+      <section><a target="_blank" rel="noopener" href="{SOCIAL['tiktok']}?refer=embed">@jamesonsdiscountmwc</a></section>
+      </blockquote></div></div>
+  <div class="social-card"><h3>Instagram</h3>
+    <div class="embed"><blockquote class="instagram-media" data-instgrm-permalink="{IG_REEL}?utm_source=ig_embed"
+      data-instgrm-version="14" style="max-width:540px;min-width:280px;width:100%;margin:0">
+      <a href="{IG_REEL}" rel="noopener">Watch on Instagram</a></blockquote></div></div>
+</div>
+<div class="social-links">
+  <a href="{SOCIAL['fb_mwc']}" rel="noopener">Facebook &middot; Midwest City</a>
+  <a href="{SOCIAL['fb_south']}" rel="noopener">Facebook &middot; South OKC</a>
+  <a href="{SOCIAL['tiktok']}" rel="noopener">TikTok @jamesonsdiscountmwc</a>
+  <a href="{SOCIAL['ig_mwc']}" rel="noopener">Instagram @jamesons_discount_mwc</a>
+</div>
+</div></section>
+<div id="fb-root"></div>
+<script>
+(function(){{
+  var done=false, el=document.getElementById('follow');
+  function load(){{
+    if(done) return; done=true;
+    ['https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v21.0',
+     'https://www.tiktok.com/embed.js',
+     'https://www.instagram.com/embed.js'].forEach(function(u){{
+      var s=document.createElement('script'); s.async=true; s.src=u;
+      if(u.indexOf('facebook')>-1) s.crossOrigin='anonymous';
+      document.body.appendChild(s);
+    }});
+  }}
+  if(!el) return;
+  if('IntersectionObserver' in window){{
+    var io=new IntersectionObserver(function(es){{
+      if(es.some(function(e){{return e.isIntersecting;}})){{ io.disconnect(); load(); }}
+    }},{{rootMargin:'400px'}});
+    io.observe(el);
+  }} else {{ load(); }}
+}})();
+</script>"""
+
+
+def footer_follow():
+    return (f'<div class="footfollow"><h4>Follow</h4>'
+            f'<a href="{SOCIAL["fb_mwc"]}" rel="noopener">Facebook &middot; Midwest City</a>'
+            f'<a href="{SOCIAL["fb_south"]}" rel="noopener">Facebook &middot; South OKC</a>'
+            f'<a href="{SOCIAL["tiktok"]}" rel="noopener">TikTok</a>'
+            f'<a href="{SOCIAL["ig_mwc"]}" rel="noopener">Instagram</a></div>')
+
 
 # ===================== PAGE CONTENT =====================
 
@@ -3146,6 +3243,7 @@ STORES = [
     dict(_id="#midwest-city", tel="+1-405-206-8111", street="7010 SE 15th Street",
          city="Midwest City", zipc="73110", lat=35.4495875, lng=-97.4043231,
          founded="2016",
+         same_as=[SOCIAL["fb_mwc"], SOCIAL["tiktok"]],
          maps_q="7010+SE+15th+Street+Midwest+City+OK+73110",
          desc="Closeout home improvement warehouse with name-brand products up to 50% off retail. "
               "Vanities, flooring, bath, kitchen, lighting, tools, patio and more. Home of Big Jim, "
@@ -3154,6 +3252,7 @@ STORES = [
     dict(_id="#south-okc", tel="+1-405-479-7918", street="8100 S. Santa Fe Ave",
          city="Oklahoma City", zipc="73139", lat=35.3867990, lng=-97.5123449,
          maps_q="8100+S+Santa+Fe+Ave+Oklahoma+City+OK+73139",
+         same_as=[SOCIAL["fb_south"]],
          desc="Closeout home improvement warehouse near I-240 with name-brand products up to 50% off retail.",
          area=["Oklahoma City", "Moore", "Norman", "Del City", "Newcastle"]),
 ]
@@ -3189,7 +3288,7 @@ def store_nodes():
             "geo": {"@type": "GeoCoordinates", "latitude": s["lat"], "longitude": s["lng"]},
             "hasMap": "https://www.google.com/maps/search/?api=1&query=" + s["maps_q"],
             "currenciesAccepted": "USD",
-            "sameAs": SAME_AS,
+            "sameAs": SAME_AS + s.get("same_as", []),
         })
         if s.get("founded"):
             out[-1]["foundingDate"] = s["founded"]
@@ -3235,7 +3334,7 @@ def video_nodes(slug, url):
 
 
 def page_schema(p):
-    url = SITE + "/" + (p["slug"] + "/" if p["slug"] else "")
+    url = page_url(p["slug"])
     if p["slug"] == "":
         graph = store_nodes() + [faq_node(url, p["faq"], p.get("sections") or ())]
     else:
@@ -3288,16 +3387,24 @@ def interior_body(p, L):
 
 
 def render_body(p, L):
-    return p["body"] if p.get("kind") == "home" else interior_body(p, L)
+    return (p["body"] + social_block()) if p.get("kind") == "home" else interior_body(p, L)
 
 
 # ------------------------------------------------------------- deploy tree
 def dep_link(slug):
-    return (BASE + "/") if slug == "" else f"{BASE}/{slug}/"
+    # No trailing slash: the live Wix site serves /flooring, not /flooring/.
+    # GitHub Pages answers /flooring from flooring.html with no redirect, so
+    # every address stays exactly as Google and backlinks already know it.
+    return (BASE + "/") if slug == "" else f"{BASE}/{slug}"
+
+
+def page_url(slug):
+    """Canonical address on the real domain, matching the live Wix sitemap."""
+    return SITE + "/" + slug if slug else SITE + "/"
 
 
 def full_page(p, body, L):
-    url = SITE + "/" + (p["slug"] + "/" if p["slug"] else "")
+    url = page_url(p["slug"])
     return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3306,7 +3413,7 @@ def full_page(p, body, L):
 <title>{p['title']}</title>
 <meta name="description" content="{strip(p['desc'])}">
 <link rel="canonical" href="{url}">
-<meta name="robots" content="{'noindex,follow' if p.get('noindex') else 'index,follow'}">{gtag_block(p.get('gtag'))}{pixel_block(p.get('pixel'))}
+<meta name="robots" content="{'noindex,follow' if (p.get('noindex') or BASE) else 'index,follow'}">{gtag_block(p.get('gtag'))}{pixel_block(p.get('pixel'))}
 <meta property="og:type" content="{'website' if p['slug']=='' else 'article'}">
 <meta property="og:title" content="{strip(p['title'])}">
 <meta property="og:description" content="{strip(p['desc'])}">
@@ -3371,14 +3478,17 @@ def build_deploy():
     urls = []
     for p in pages:
         body = render_body(p, dep_link)
-        d = SITEDIR if p["slug"] == "" else os.path.join(SITEDIR, p["slug"])
-        os.makedirs(d, exist_ok=True)
-        with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as f:
+        # Home is index.html; every other page is <slug>.html, which GitHub
+        # Pages serves at /<slug> (no slash, no redirect).
+        out = (os.path.join(SITEDIR, "index.html") if p["slug"] == ""
+               else os.path.join(SITEDIR, p["slug"] + ".html"))
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, "w", encoding="utf-8") as f:
             f.write(full_page(p, body, dep_link))
         # A noindex page is still built and still reachable by its URL — it just
         # stays out of the sitemap, so nothing invites Google to a paid lander.
         if not p.get("noindex"):
-            urls.append(SITE + "/" + (p["slug"] + "/" if p["slug"] else ""))
+            urls.append(page_url(p["slug"]))
 
     # 404
     nf = dict(slug="404", nav="", title="Page not found | " + BIZ, desc="Page not found.",

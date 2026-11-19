@@ -499,6 +499,29 @@ Open Graph, Twitter card, theme-color) and 3–4 `<script>` tags (JSON-LD, searc
 nav cue, and the video script on pages that carry one). No analytics or tag
 manager is installed on this site at present.
 
+## Addresses now match the live site exactly (Nov 2026)
+
+The live Wix sitemap lists `/flooring`, not `/flooring/`. The rebuild used to
+write `flooring/index.html`, which GitHub Pages serves at `/flooring/` and
+reaches from `/flooring` only through a 301. Pages are now written as
+`flooring.html`; GitHub Pages answers `/flooring` straight from it, and the
+canonical tag, sitemap and every internal link use the no-slash form. Home stays
+`index.html` at `/`.
+
+While `BASE` is set (the github.io test address), every page carries
+`noindex` so the test copy can't compete with discountokc.com in search. At
+cutover `BASE` goes empty and pages go back to `index,follow` on their own.
+
+## Socials (Nov 2026)
+
+From the codes Jess sent: Facebook Page plugin (Midwest City), a TikTok store
+tour video, one Instagram Reel, and plain links to both Facebook pages, TikTok
+and Instagram. The section is on the home page; the links are in every footer.
+The three platform scripts load only when the section scrolls near the screen,
+so they cost nothing on first paint. TikTok and Facebook (Midwest City) are in
+the Midwest City store's `sameAs`; Facebook (South OKC) is in South OKC's.
+To swap the video or Reel, change `TIKTOK_VIDEO` or `IG_REEL` in `build.py`.
+
 ## Condition language
 
 The site used to claim inventory was "not seconds, not returns." It isn't — the
