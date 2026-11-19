@@ -1172,6 +1172,7 @@ NAV = [
     ("patio", "Patio", "umbrella"), ("lighting", "Lights &amp; Fans", "bulb"),
     ("tools", "Tools", "tool"), ("inventory", "Other", "boxes"),
     ("deals", "Deals", "tag"), ("rubbermulchokc", "Mulch", "truck"),
+    ("spare-parts", "Spare Parts", "box"),
 ]
 NAV_MORE = [("bulk-rubber-mulch", "Bulk Mulch"), ("spare-parts", "Spare Parts"), ("about", "About"),
             ("location", "Locations"), ("contact", "Contact")]
@@ -3153,7 +3154,7 @@ def build_pages(L):
         ]))
 
     cat.append(dict(
-        slug="spare-parts", nav="",
+        slug="spare-parts", nav="spare-parts",
         title="Spare Parts &amp; One-Off Units | Jameson's eBay Store | Ships Anywhere",
         desc=("Hard-to-find spare parts and one-off units from Jameson's Discount Home Improvement Warehouse, "
               "including ceiling fan parts, sold through our eBay store jamesons.stores.okc and shipped anywhere."),
