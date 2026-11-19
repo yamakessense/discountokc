@@ -975,7 +975,7 @@ PHOTOS = {
     ("0172ec_e44824fd8c3d40e3b8cb4db9b7c5b56b~mv2.jpg",
      "Visions Quality Coatings paint at $21.99 a gallon"),
     ("0172ec_aa97ca263ee648dfaa70da5ecabd2b50~mv2.jpg",
-     "Rubber mulch summer special, $500 per supersack, pickup only"),
+     "Rubber mulch fall special, $500 per supersack, pickup only"),
     ("0172ec_55f0e1ea155d4e29b1e3160290039fca~mv2.jpg",
      "Waterproof LVP flooring from $2.19 per square foot"),
   ],
@@ -1267,7 +1267,7 @@ def catnav(L, current):
 
 
 def ticket():
-    return ('<div class="ticket"><div class="wrap"><b>Summer special</b>'
+    return ('<div class="ticket"><div class="wrap"><b>Fall special</b>'
             '<span>IPEMA-certified chunk rubber nuggets</span>'
             '<span class="tag">$500 / supersack</span>'
             '<span>pickup only &middot; in stock now</span>'
@@ -1847,7 +1847,7 @@ def build_pages(L):
     <div class="prices">
       <div class="chip"><b>$8</b>24-lb bag</div>
       <div class="chip"><b>$601</b>2,000-lb supersack</div>
-      <div class="chip"><b>$500</b>summer special, pickup</div>
+      <div class="chip"><b>$500</b>fall special, pickup</div>
     </div>
     <div class="btnrow">
       <a class="btn btn-white" href="https://405rubbermulch.com">Regional truckload delivery &mdash; 405RubberMulch.com</a>
@@ -1900,7 +1900,7 @@ def build_pages(L):
      "Yes &mdash; our wholesale arm, 405RubberMulch.com, delivers flatbed truckloads to schools, cities and "
      "contractors across Oklahoma, Kansas, Missouri and Arkansas."),
     ("What does rubber mulch cost?",
-     "$8 per 24-lb bag and $601 per 2,000-lb supersack. All summer: IPEMA-certified chunk rubber nuggets at "
+     "$8 per 24-lb bag and $601 per 2,000-lb supersack. This fall: IPEMA-certified chunk rubber nuggets at "
      "$500 per supersack, pickup only. Volume discounts available."),
     ("Do you carry paint?",
      "Yes &mdash; Visions Quality Coatings Workhorse interior and exterior latex at $21.99 a gallon or $99 for the "
@@ -1931,7 +1931,7 @@ def build_pages(L):
              "Yes — our wholesale arm, 405RubberMulch.com, delivers flatbed truckloads to schools, cities and "
              "contractors across Oklahoma, Kansas, Missouri and Arkansas."),
             ("What does rubber mulch cost?",
-             "$8 per 24-lb bag and $601 per 2,000-lb supersack. All summer: IPEMA-certified chunk rubber nuggets at "
+             "$8 per 24-lb bag and $601 per 2,000-lb supersack. This fall: IPEMA-certified chunk rubber nuggets at "
              "$500 per supersack, pickup only. Volume discounts available."),
             ("Do you carry paint?",
              "Yes — Visions Quality Coatings Workhorse interior and exterior latex at $21.99 a gallon or $99 for the "
@@ -2655,11 +2655,11 @@ def build_pages(L):
         slug="rubbermulchokc", nav="rubbermulchokc",
         title="Playground Certified Bulk Rubber Mulch in Stock &mdash; OKC | Jameson's",
         desc=("IPEMA-certified playground rubber mulch in stock in the OKC metro: $8 per 24-lb bag, $601 per "
-              "2,000-lb supersack, summer special $500 per supersack, pickup only."),
+              "2,000-lb supersack, fall special $500 per supersack, pickup only."),
         h1="Playground certified bulk rubber mulch in stock &mdash; OKC",
         lead="IPEMA-certified chunk rubber nuggets, bagged or by the supersack, for pickup at either store.",
-        chips=[("$8", "24-lb bag"), ("$601", "2,000-lb supersack"), ("$500", "summer special, pickup only")],
-        # The $500 supersack price is a summer special and will lapse, so the
+        chips=[("$8", "24-lb bag"), ("$601", "2,000-lb supersack"), ("$500", "fall special, pickup only")],
+        # The $500 supersack price is a fall special and will lapse, so the
         # supersack is marked up at its standing $601. Stale markup on an expired
         # price is worse than no markup.
         products=[
@@ -2675,7 +2675,7 @@ def build_pages(L):
                  photo="0172ec_9111a136d9c641c0a1ffec33d89cc110~mv2.jpg")],
         paras=[
             "Jameson's stocks IPEMA-certified chunk rubber nuggets for playgrounds, landscape beds and play areas at "
-            "both OKC-metro stores. Buy it by the 24-lb bag at $8, or by the 2,000-lb supersack at $601. All summer "
+            "both OKC-metro stores. Buy it by the 24-lb bag at $8, or by the 2,000-lb supersack at $601. All fall "
             "long, IPEMA-certified chunk rubber nuggets are $500 per supersack, pickup only. Volume discounts are "
             "available &mdash; ask at the counter.",
             "Rubber mulch is the low-maintenance choice for play areas: it doesn't decompose, doesn't need topping off "
@@ -2739,7 +2739,7 @@ def build_pages(L):
             ("Is your rubber mulch playground certified?",
              "Yes — IPEMA-certified chunk rubber nuggets, in stock for pickup at Jameson's."),
             ("What does rubber mulch cost in Oklahoma City?",
-             "$8 per 24-lb bag and $601 per 2,000-lb supersack at Jameson's. All summer: IPEMA-certified chunk rubber "
+             "$8 per 24-lb bag and $601 per 2,000-lb supersack at Jameson's. This fall: IPEMA-certified chunk rubber "
              "nuggets at $500 per supersack, pickup only. Volume discounts available."),
             ("Do you deliver, or is it pickup only?",
              "In-store purchases are pickup. For truckload quantities delivered to schools, cities and contractors, "
@@ -2752,14 +2752,14 @@ def build_pages(L):
     cat.append(dict(
         slug="bulk-rubber-mulch", nav="bulk-rubber-mulch",
         title="Bulk Rubber Mulch &mdash; Supersacks &amp; Truckloads | OKC | Jameson's",
-        desc=("Bulk IPEMA-certified rubber mulch in the OKC metro: $601 per 2,000-lb supersack, $500 summer special, "
+        desc=("Bulk IPEMA-certified rubber mulch in the OKC metro: $601 per 2,000-lb supersack, $500 fall special, "
               "pickup only. Flatbed truckload delivery through 405RubberMulch.com."),
         h1="Bulk rubber mulch &mdash; supersacks &amp; truckloads",
         lead="Supersacks for pickup at either store; flatbed truckloads delivered across four states.",
-        chips=[("$601", "2,000-lb supersack"), ("$500", "summer special, pickup only"), ("4 states", "truckload delivery")],
+        chips=[("$601", "2,000-lb supersack"), ("$500", "fall special, pickup only"), ("4 states", "truckload delivery")],
         paras=[
             "For anything bigger than a few bags, the 2,000-lb supersack is the way to buy. Supersacks are $601 each, "
-            "and all summer long IPEMA-certified chunk rubber nuggets are $500 per supersack, pickup only. Bring a "
+            "and all fall long IPEMA-certified chunk rubber nuggets are $500 per supersack, pickup only. Bring a "
             "truck or trailer rated for the load &mdash; a supersack weighs a ton, literally.",
             "405RubberMulch.com &mdash; our regional wholesale arm serving Oklahoma, Kansas, Missouri &amp; Arkansas "
             "&mdash; handles the volume side. Schools, municipalities, parks departments and contractors get flatbed "
@@ -2805,7 +2805,7 @@ def build_pages(L):
         ],
         faq=[
             ("How much does a supersack of rubber mulch cost?",
-             "$601 per 2,000-lb supersack. All summer, IPEMA-certified chunk rubber nuggets are $500 per supersack, "
+             "$601 per 2,000-lb supersack. This fall, IPEMA-certified chunk rubber nuggets are $500 per supersack, "
              "pickup only. Volume discounts available."),
             ("Do you deliver truckloads?",
              "Yes — 405RubberMulch.com delivers flatbed truckloads to schools, cities and contractors across Oklahoma, "
@@ -2883,7 +2883,7 @@ def build_pages(L):
   <div class="card"><span class="eyebrow">Also always here</span><h3>Paint</h3>
   <p>Visions Quality Coatings Workhorse interior and exterior latex, $21.99 a gallon or $99 for the 5-gallon bucket.</p></div>
   <div class="card"><span class="eyebrow">Also always here</span><h3>Rubber mulch</h3>
-  <p>IPEMA-certified chunk rubber nuggets: $8 per 24-lb bag, $601 per 2,000-lb supersack, $500 summer special, pickup only.
+  <p>IPEMA-certified chunk rubber nuggets: $8 per 24-lb bag, $601 per 2,000-lb supersack, $500 fall special, pickup only.
   <a href="{L('rubbermulchokc')}">See mulch details</a>.</p></div>
 </div>''',
         faq=[
@@ -2978,7 +2978,7 @@ def build_pages(L):
               '</tbody></table></div>',
               "Five gallons of paint bought as single cans would be $109.95, so the bucket saves $10.95 on the same "
               "paint.",
-              "The $500 supersack price on this page is a summer special, pickup only, and it is not one of the "
+              "The $500 supersack price on this page is a fall special, pickup only, and it is not one of the "
               "standing numbers &mdash; the standing supersack price is $601.",
               "Everything else on the floor is whatever came off the truck this week. Seasonal and holiday decor runs "
               "alongside all of it, and it lands early rather than late."]),
@@ -2996,7 +2996,7 @@ def build_pages(L):
         ],
         extra=lambda L: f'''
 <div class="split" style="margin:1.3rem 0">
-  <div class="card"><span class="eyebrow">Summer special</span><h3>Rubber mulch &mdash; $500 per supersack</h3>
+  <div class="card"><span class="eyebrow">Fall special</span><h3>Rubber mulch &mdash; $500 per supersack</h3>
   <p>IPEMA-certified chunk rubber nuggets, 2,000-lb supersack, pickup only. Regular price $601; bags are $8 for 24 lb.
   <a href="{L('bulk-rubber-mulch')}">Bulk details</a>.</p></div>
   <div class="card"><span class="eyebrow">Every day</span><h3>Visions paint &mdash; $21.99 a gallon</h3>
