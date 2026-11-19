@@ -1173,7 +1173,7 @@ NAV = [
     ("tools", "Tools", "tool"), ("inventory", "Other", "boxes"),
     ("deals", "Deals", "tag"), ("rubbermulchokc", "Mulch", "truck"),
 ]
-NAV_MORE = [("bulk-rubber-mulch", "Bulk Mulch"), ("about", "About"),
+NAV_MORE = [("bulk-rubber-mulch", "Bulk Mulch"), ("spare-parts", "Spare Parts"), ("about", "About"),
             ("location", "Locations"), ("contact", "Contact")]
 
 
@@ -1192,6 +1192,7 @@ SEARCH_INDEX = {
   "about": "about closeout overstock story who family owned",
   "location": "location locations hours directions address map midwest city south okc i-240",
   "contact": "contact phone call email question",
+  "spare-parts": "spare parts part replacement ceiling fan parts blade arm downrod remote receiver ebay online ship shipping one-off",
 }
 
 
@@ -3152,6 +3153,43 @@ def build_pages(L):
         ]))
 
     cat.append(dict(
+        slug="spare-parts", nav="",
+        title="Spare Parts &amp; One-Off Units | Jameson's eBay Store | Ships Anywhere",
+        desc=("Hard-to-find spare parts and one-off units from Jameson's Discount Home Improvement Warehouse, "
+              "including ceiling fan parts, sold through our eBay store jamesons.stores.okc and shipped anywhere."),
+        h1="Spare parts and one-off units, shipped anywhere",
+        lead="The odd part you can't find in a big box store is often sitting in our eBay store.",
+        paras=[
+            "Closeout lots come with leftovers: a single unit, a part kit, a replacement piece for a line nobody "
+            "carries anymore. We don't put those on the floor. We list them online through our eBay store, "
+            f"<a href=\"{EBAY_URL}\" rel=\"noopener\">jamesons.stores.okc</a>, and ship them anywhere.",
+            "Ceiling fan parts are the biggest group. If a fan is otherwise fine and you need a blade arm, a downrod "
+            "or a remote receiver, check the eBay store or call before you replace the whole fan.",
+            "eBay handles the checkout, payment and shipping, so you buy with eBay's own buyer protection. The store "
+            "carries 100% positive feedback across hundreds of sales.",
+        ],
+        extra=lambda L: f'''
+<div class="split" style="margin:1.3rem 0">
+  <div class="card"><span class="eyebrow">Shop online</span><h3>jamesons.stores.okc on eBay</h3>
+  <p>One-off units and harder-to-find parts. Ships anywhere.</p>
+  <div class="btnrow"><a class="btn btn-ink" href="{EBAY_URL}" rel="noopener">Open our eBay store</a></div></div>
+  <div class="card"><span class="eyebrow">Ask first</span><h3>Not listed yet?</h3>
+  <p>Call Midwest City at 405-206-8111 or South OKC at 405-479-7918. Staff can check the back for the part.</p>
+  <div class="btnrow"><a class="btn btn-ink" href="tel:+14052068111">Call Midwest City</a></div></div>
+</div>''',
+        faq=[
+            ("Does Jameson's sell spare parts online?",
+             "Yes. One-off units and harder-to-find parts, including ceiling fan parts, are sold through the "
+             "Jameson's eBay store, jamesons.stores.okc, and ship anywhere."),
+            ("Can I buy floor stock online?",
+             "No. Floor stock at the Midwest City and South OKC stores is sold in person, because closeout lots "
+             "turn over weekly. Only spare parts and one-off units are listed online."),
+            ("What if the part I need isn't listed?",
+             "Call the store: 405-206-8111 in Midwest City or 405-479-7918 in South OKC. Staff will check what is "
+             "in the building."),
+        ]))
+
+    cat.append(dict(
         slug="contact", nav="contact",
         title="Contact Jameson's | Midwest City 405-206-8111 &middot; South OKC 405-479-7918",
         desc=("Contact Jameson's Discount Home Improvement Warehouse: Midwest City 405-206-8111, South OKC "
@@ -3257,6 +3295,9 @@ STORES = [
          area=["Oklahoma City", "Moore", "Norman", "Del City", "Newcastle"]),
 ]
 
+ALT_NAMES = ["Jameson's Discount Home Improvement", "Jameson's Discount", "Jameson's", "Discount OKC",
+             "discountokc.com"]
+
 # Only URLs confirmed by the owner belong in sameAs.
 SAME_AS = [
     "https://www.instagram.com/discountokc/",
@@ -3278,6 +3319,9 @@ def store_nodes():
     for s in STORES:
         out.append({
             "@type": "HardwareStore", "@id": SITE + "/" + s["_id"], "name": BIZ, "url": SITE,
+            # AI answers have been calling the business "discount okc" without
+            # tying it to this site. Naming the variants here ties them back.
+            "alternateName": ALT_NAMES,
             "telephone": s["tel"], "priceRange": "$$", "description": s["desc"],
             "address": {"@type": "PostalAddress", "streetAddress": s["street"], "addressLocality": s["city"],
                         "addressRegion": "OK", "postalCode": s["zipc"], "addressCountry": "US"},
@@ -3299,6 +3343,11 @@ def store_nodes():
                        "truckloads of IPEMA-certified playground rubber mulch across Oklahoma, Kansas, Missouri and Arkansas.",
         "areaServed": ["Oklahoma", "Kansas", "Missouri", "Arkansas"],
         "parentOrganization": {"@id": SITE + "/#midwest-city"},
+    })
+    out.append({
+        "@type": "WebSite", "@id": SITE + "/#website", "url": SITE + "/", "name": BIZ,
+        "alternateName": ALT_NAMES, "inLanguage": "en-US",
+        "publisher": {"@id": SITE + "/#midwest-city"},
     })
     return out
 
@@ -3516,6 +3565,8 @@ def build_deploy():
             for u in urls)
         f.write('<?xml version="1.0" encoding="UTF-8"?>'
                 f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{items}</urlset>')
+    with open(os.path.join(SITEDIR, "llms.txt"), "w", encoding="utf-8") as f:
+        f.write(llms_txt(pages))
     with open(os.path.join(SITEDIR, "robots.txt"), "w", encoding="utf-8") as f:
         # `User-agent: *` already permits everything, but the answer engines are
         # named one by one on purpose: it is unambiguous to anyone auditing the
@@ -3532,6 +3583,38 @@ def build_deploy():
         with open(os.path.join(SITEDIR, "CNAME"), "w", encoding="utf-8") as f:
             f.write("www.discountokc.com\n")
     return pages
+
+
+def llms_txt(pages):
+    """Plain-language facts for AI agents, per the llms.txt convention.
+    Built from the same constants as the pages so the two never disagree."""
+    lines = [f"# {BIZ}", "",
+             f"> {BIZ} is a family-run closeout home improvement warehouse in the Oklahoma City metro, "
+             "selling name-brand flooring, vanities, bath, kitchen, lighting, ceiling fans, tools, patio, paint and "
+             "playground-certified rubber mulch at up to 50% off retail. Website: https://www.discountokc.com. "
+             "Also known as Jameson's Discount and Discount OKC.", "",
+             "## Stores", ""]
+    for st in STORES:
+        name = "Midwest City" if "midwest" in st["_id"] else "South OKC"
+        lines.append(f"- {name}: {st['street']}, {st['city']}, OK {st['zipc']}. Phone {st['tel'][3:]}.")
+    lines += ["- Hours, both stores: Tuesday to Saturday 9 am to 6 pm, Sunday 10 am to 6 pm, closed Monday.",
+              "- Email: save@discountokc.com. Selling inventory to us: b2b@discountokc.com.",
+              "- Floor stock is sold in person only and changes weekly. Call the store to check stock.", "",
+              "## Pages", ""]
+    for p in pages:
+        if p.get("noindex"):
+            continue
+        name = "Home" if p["slug"] == "" else strip(p["h1"])
+        lines.append(f"- [{name}]({page_url(p['slug'])}): {strip(p['desc'])}")
+    lines += ["", "## Related", "",
+              "- [405RubberMulch.com](https://405rubbermulch.com): regional wholesale arm, flatbed truckloads of "
+              "IPEMA-certified playground rubber mulch to schools and towns in Oklahoma, Kansas, Missouri and Arkansas.",
+              f"- [eBay store jamesons.stores.okc]({EBAY_URL}): spare parts and one-off units, shipped anywhere.",
+              f"- [Facebook, Midwest City]({SOCIAL['fb_mwc']})",
+              f"- [Facebook, South OKC]({SOCIAL['fb_south']})",
+              f"- [TikTok]({SOCIAL['tiktok']})",
+              f"- [Instagram]({SOCIAL['ig_mwc']})", ""]
+    return "\n".join(lines)
 
 
 # ------------------------------------------------------------ preview file

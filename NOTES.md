@@ -522,6 +522,18 @@ so they cost nothing on first paint. TikTok and Facebook (Midwest City) are in
 the Midwest City store's `sameAs`; Facebook (South OKC) is in South OKC's.
 To swap the video or Reel, change `TIKTOK_VIDEO` or `IG_REEL` in `build.py`.
 
+## Spare parts page and agent-facing files (Nov 2026)
+
+`/spare-parts` is a new page, the 16th. It sends shoppers to the eBay store
+(`EBAY_URL`) for one-off units and parts; eBay runs the checkout, so the site
+still has no cart. Adding a page is safe; renaming one of the original 15 is not.
+
+`llms.txt` at the site root is built from the same constants as the pages:
+name, both stores, hours, contact, every page with its description, and
+related profiles. Store nodes and a WebSite node carry `alternateName`
+(Jameson's Discount, Discount OKC, discountokc.com) so AI answers that say
+"discount okc" can tie that name to this domain.
+
 ## Condition language
 
 The site used to claim inventory was "not seconds, not returns." It isn't — the
